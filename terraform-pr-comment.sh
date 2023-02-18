@@ -93,7 +93,7 @@ function _render_plan
     local content
     content=""
     # First, render summary from `terraform show -json`, if json file available
-    if [[ ! -f "${show_plan_json}" ]]; then
+    if [[ -f "${show_plan_json}" ]]; then
         # shellcheck disable=SC2002
         changes=$(cat "${show_plan_json}" | jq -r '[.resource_changes[]? | { resource: .address, action: .change.actions[] } | select (.action != "no-op")]')
         summary=$(echo "${changes}" | jq -r '.   | "Environment has \(length) changes"')
@@ -104,7 +104,7 @@ function _render_plan
     fi
     # Next, render `terraform show`
     local raw_log
-    if [[ ! -f "${show_plan}" ]]; then
+    if [[ -f "${show_plan}" ]]; then
         raw_log=$(< "${1}")
         raw_log="${raw_log%%*( )}"
         if [[ -n "${raw_log}" ]]; then
