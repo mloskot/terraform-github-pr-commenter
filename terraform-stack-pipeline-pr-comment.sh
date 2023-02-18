@@ -59,7 +59,7 @@ fi
 
 if command -v "iconv" &> /dev/null; then
     echo -e "\033[32;1mINFO:\033[0m Running iconv to escape comment content"
-    TERRAFORM_COMMAND_PR_COMMENT=$(echo "$RESULT_PR_COMMENT" | iconv -c -f utf-8 -t ascii | sed 's/$/\\n/' file | tr -d '\n')
+    TERRAFORM_COMMAND_PR_COMMENT=$(echo "$RESULT_PR_COMMENT" | iconv -c -f utf-8 -t ascii | sed 's/$/\\n/' | tr -d '\n')
 else
     echo -e "\033[32;1mINFO:\033[0m iconv not found, escaping comment content using simpler methods"
 fi
