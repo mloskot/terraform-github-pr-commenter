@@ -25,3 +25,5 @@ steps:
         echo "XXX"
         echo ${TERRAFORM_COMMAND_PR_COMMENT}
         echo "ZZZ"
+        echo $(TERRAFORM_COMMAND_PR_COMMENT)
+        echo "YYY"
