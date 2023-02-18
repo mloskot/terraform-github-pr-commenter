@@ -10,10 +10,9 @@ pool:
   vmImage: ubuntu-latest
 
 steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
-
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+    # Post GitHub PR comment with validation results
+    - bash: |
+        source '$(System.DefaultWorkingDirectory)/terraform-stack-pipeline-pr-comment.sh' validate '$(System.DefaultWorkingDirectory)'
+      #  TERRAFORM_COMMAND_PR_COMMENT=${TERRAFORM_COMMAND_PR_COMMENT//\\n/%0D%0A}
+      #  echo "##vso[task.setvariable variable=TERRAFORM_COMMAND_PR_COMMENT]$TERRAFORM_COMMAND_PR_COMMENT"
+      displayName: 'Comment PR - Terraform Validate'
