@@ -14,10 +14,14 @@ steps:
     - bash: |
         sudo apt-get install -qq - uni2ascii
         source '$(System.DefaultWorkingDirectory)/terraform-stack-pipeline-pr-comment.sh' validate '$(System.DefaultWorkingDirectory)'
+        echo "XXX"
+        echo ${TERRAFORM_COMMAND_PR_COMMENT}
+        echo "ZZZ"
+
         echo "##vso[task.setvariable variable=TERRAFORM_COMMAND_PR_COMMENT]$TERRAFORM_COMMAND_PR_COMMENT"
       displayName: 'Comment PR - Terraform Validate'
 
     - bash: |
         echo "XXX"
-        echo $(TERRAFORM_COMMAND_PR_COMMENT)
+        echo ${TERRAFORM_COMMAND_PR_COMMENT}
         echo "ZZZ"
