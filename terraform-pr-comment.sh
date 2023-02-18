@@ -45,9 +45,46 @@ function _escape_content
     if command -v "iconv" &> /dev/null; then
         echo "${1}" | iconv -c -f utf-8 -t ascii//TRANSLIT | sed -E ':a;N;$!ba;s/\r{0,1}\n/\\n/g'
     elif command -v "konwert" &> /dev/null; then
-        echo "${1}" | konwert utf8-ascii | sed -E ':a;N;$!ba;s/\r{0,1}\n/\\n/g'
-    else
+        echo "${1}" | konwert utf8-ascii | sed -E ':a;N;$!ba;s/\r{0,1}\n/\\n/g' | sed s/^\?//g
+    fi
+}
+
+function _render_fmt
+{
+    if [[ ! -f "${1}" ]]; then
         return 1
+    fi
+    local raw_log
+    raw_log=$(< "${1}")
+    raw_log="${raw_log%%*( )}"
+    if [[ -n "${raw_log}" ]]; then
+        local esc_log
+        esc_log=$(_escape_content "${raw_log}")
+        # shellcheck disable=SC2028
+        echo "<details><summary>Show</summary>\n\n\`\`\`diff\n${esc_log}\n\`\`\`\n</details>\n\n"
+    else
+        echo "Success! The files are well-formed."
+    fi
+}
+
+function _render_validate
+{
+    if [[ ! -f "${1}" ]]; then
+        return 1
+    fi
+    local raw_log
+    raw_log=$(< "${1}")
+    local esc_log
+    esc_log=$(_escape_content "${raw_log}")
+    if [[ -n "${esc_log}" ]]; then
+        # shellcheck disable=SC2076
+        if [[ "${esc_log}" =~ "Success! The configuration is valid." ]]; then
+            # shellcheck disable=SC2028
+            echo "${esc_log}\n"
+        else
+            # shellcheck disable=SC2028
+            echo "<details><summary>Show</summary>\n\n\`\`\`\n${esc_log}\n\`\`\`\n</details>\n\n"
+        fi
     fi
 }
 
@@ -59,23 +96,21 @@ logs_collected=0
 echo -e "\033[32;1mINFO:\033[0m Rendering Terraform ${arg_command} comment from ${arg_logs_path}"
 comment="## Build \`${arg_build_number}\`: Terraform \`${arg_command}\`\n\n"
 # shellcheck disable=SC2045
-for log_file in $(ls --sort=version "${arg_logs_path}"/*."${arg_command}".{log,txt}); do
+for log_file in $(ls --sort=version "${arg_logs_path}"/*."${arg_command}".{log,txt} 2>/dev/null); do
     echo -e "\033[32;1mINFO:\033[0m Rendering ${arg_command} output from ${log_file}"
     # Render section title
     section=$(basename "${log_file}")
     section=$(echo "${section}" | cut -d '_' -f 2 | cut -d . -f 1)
     comment+="### Layer: \`${section}\`\n\n"
     # Render section content
-    raw_log=$(< "${log_file}")
-    set -e
-    raw_log=$(_escape_content "${raw_log}") || (echo -e "\033[31;1mERROR:\033[0m Missing reliable Unicode to ASCII converter for the fancy Terraform output"; exit 1)
-    set +e
-    # shellcheck disable=SC2076
-    if [[ "${raw_log}" =~ "Success! The configuration is valid." ]]; then
-        comment+="${raw_log}\n"
-    else
-        comment+="<details><summary>Show</summary>\n\n\`\`\`\n${raw_log}\n\`\`\`\n</details>\n\n"
+    content=$(_render_"${arg_command}"  "${log_file}")
+    if [[ -z "${content}" ]]; then
+        set -e
+        echo -e "\033[31;1mERROR:\033[0m Rendering ${arg_command} output failed"
+        exit 1
     fi
+    comment+="${content}"
+
     ((logs_collected++))
 done
 comment+="\n\n"
