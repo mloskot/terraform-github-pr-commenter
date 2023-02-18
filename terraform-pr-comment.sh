@@ -49,9 +49,9 @@ fi
 function _escape_content
 {
     if command -v "iconv" &> /dev/null; then
-        echo "${1}" | iconv -c -f utf-8 -t ascii//TRANSLIT | sed -E ':a;N;$!ba;s/\r{0,1}\n/\\n/g' | sed s/^\?//g
+        echo "${1}" | iconv -c -f utf-8 -t ascii//TRANSLIT | sed s/^\?//g | sed -E ':a;N;$!ba;s/\r{0,1}\n/\\n/g'
     elif command -v "konwert" &> /dev/null; then
-        echo "${1}" | konwert utf8-ascii | sed -E ':a;N;$!ba;s/\r{0,1}\n/\\n/g' | sed s/^\?//g
+        echo "${1}" | konwert utf8-ascii | sed s/^\?//g | sed -E ':a;N;$!ba;s/\r{0,1}\n/\\n/g'
     fi
 }
 
@@ -69,6 +69,7 @@ function _render_fmt
         # shellcheck disable=SC2028
         echo "<details><summary>Show</summary>\n\n\`\`\`diff\n${esc_log}\n\`\`\`\n</details>\n\n"
     else
+        # shellcheck disable=SC2028
         echo "Success! The files are well-formed.\n\n"
     fi
 }
