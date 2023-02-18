@@ -1,4 +1,5 @@
 #!/bin/bash
+VERSION="0.1.0"
 # Collect output of given Terraform command from log files in given location
 # and render it in Markdown for PR comment,
 # then return it via exported environment variable.
@@ -14,9 +15,13 @@
 # <command> used in the comment title together with given build number
 #
 if [[ $# -ne 3 ]]; then
+    echo "terraform-githbu-pr-commenter v${VERSION}"
+    echo
     echo "Usage: $0 <terraform command> <path to terraform command output files> <build number>"
+    echo
     echo "  <terraform command> is fmt, plan or validate"
     echo "  <build number> is anything Azure Pipelines or GitHub Actions can provide"
+    echo
     exit 1
 fi
 if [[ -z "$1" ]]; then
