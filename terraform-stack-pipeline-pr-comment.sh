@@ -26,6 +26,7 @@ logs_collected=0
 
 echo -e "\033[32;1mINFO:\033[0m Rendering Terraform ${command} comment from ${logs_path}"
 output="## Build ${build_number}: Terraform ${command}\n\n"
+output=""
 
 for cmd_log in "${logs_path}"/*".${command}.txt"; do
     echo -e "\033[32;1mINFO:\033[0m Reading ${command} output from ${cmd_log}"
@@ -34,13 +35,14 @@ for cmd_log in "${logs_path}"/*".${command}.txt"; do
     layer=$(echo "${layer}" | cut -d '_' -f 2 | cut -d . -f 1)
     raw_log=$(< "${cmd_log}")
     # Render section for layer
-    output+="### Layer: ${layer}\n\n"
+    #output+="### Layer: ${layer}\n\n"
+    output+="${raw_log}\n"
     # shellcheck disable=SC2076
-    if [[ "${raw_log}" =~ "Success! The configuration is valid." ]]; then
-        output+="${raw_log}\n"
-    else
-        output+="<details><summary>Show</summary>\n\n<verbatim>\n${raw_log}\n</verbatim>\n</details>\n\n"
-    fi
+    # if [[ "${raw_log}" =~ "Success! The configuration is valid." ]]; then
+    #     output+="${raw_log}\n"
+    # else
+    #     output+="<details><summary>Show</summary>\n\n<verbatim>\n${raw_log}\n</verbatim>\n</details>\n\n"
+    # fi
     ((logs_collected++))
     if [[ $logs_collected -gt 1 ]]; then
         break
