@@ -55,9 +55,9 @@ else
     RESULT_PR_COMMENT=""
 fi
 
-if command -v "jq" &> /dev/null; then
+if command -v "iconv" &> /dev/null; then
     echo -e "\033[32;1mINFO:\033[0m Running jq to escape comment content"
-    TERRAFORM_COMMAND_PR_COMMENT=$(echo "$RESULT_PR_COMMENT" | jq -sRr @uri)
+    TERRAFORM_COMMAND_PR_COMMENT=$(echo "$RESULT_PR_COMMENT" | iconv -c -f utf-8 -t ascii)
 else
     echo -e "\033[32;1mINFO:\033[0m uni2ascii not found, escaping comment content using simpler methods"
 fi
