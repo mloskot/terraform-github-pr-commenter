@@ -1,8 +1,5 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
+# Pipeline renders comment content and, if run for GitHub PR,
+# posts the comment to the GitHub PR that triggered the comment.
 trigger:
 - main
 
@@ -10,12 +7,11 @@ pool:
   vmImage: ubuntu-latest
 
 steps:
-    # Post GitHub PR comment with validation results
     - bash: |
         echo '$(Build.Reason)'
         echo '$(System.PullRequest.PullRequestNumber)'
         echo ''
-        source '$(System.DefaultWorkingDirectory)/terraform-stack-pipeline-pr-comment.sh' validate '$(System.DefaultWorkingDirectory)' '$(Build.BuildNumber)'
+        source '$(System.DefaultWorkingDirectory)/terraform-pr-comment.sh' validate '$(System.DefaultWorkingDirectory)' '$(Build.BuildNumber)'
         echo "XXX"
         echo ${TERRAFORM_COMMAND_PR_COMMENT}
         echo "ZZZ"
