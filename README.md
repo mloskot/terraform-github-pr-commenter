@@ -52,9 +52,11 @@ It is a very simple script.
 ## Credits
 
 - [@sbulav](https://github.com/sbulav) for [Terraform processing with `jq`](https://sbulav.github.io/terraform/terraform-vs-github-actions/)
-   and showing how to use [github.issues.createComment](https://github.com/actions/github-script) from GitHub Script.
+   and showing how to use [github.issues.createComment](https://github.com/actions/github-script)
 - [@nbellocam](https://github.com/nbellocam) for [Azure Pipelines task `GitHubComment@0` show case](https://medium.com/southworks/continuous-integration-for-smart-contracts-4a8b78d387c)
 - [@robertwbradford](https://github.com/robertwbradford) for [solving multi-line comment with `GitHubComment@0`](https://stackoverflow.com/a/72277737/151641)
 - [@robburger](https://github.com/robburger) for [terraform-pr-commenter scripted in Bash](https://github.com/robburger/terraform-pr-commenter/blob/10779c60059f0f099ef676a9dde158d646555473/entrypoint.sh)
 - [@ahmadnassri](https://github.com/ahmadnassri) for [inspiring Terraform reports](https://github.com/ahmadnassri/action-terraform-report)
 - [@gunkow](https://github.com/gunkow) for another example of [inspiring Terraform reports](https://github.com/gunkow/terraform-pr-commenter)
+
+Thank you all! ~Mateusz Łoskot
