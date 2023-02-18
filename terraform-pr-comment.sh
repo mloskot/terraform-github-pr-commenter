@@ -64,7 +64,7 @@ for log_file in $(ls --sort=version "${arg_logs_path}"/*."${arg_command}".{log,t
     # Render section title
     section=$(basename "${log_file}")
     section=$(echo "${section}" | cut -d '_' -f 2 | cut -d . -f 1)
-    comment+="### Layer: ${section}\n\n"
+    comment+="### Layer: \`${section}\`\n\n"
     # Render section content
     raw_log=$(< "${log_file}")
     set -e
@@ -74,7 +74,7 @@ for log_file in $(ls --sort=version "${arg_logs_path}"/*."${arg_command}".{log,t
     if [[ "${raw_log}" =~ "Success! The configuration is valid." ]]; then
         comment+="${raw_log}\n"
     else
-        comment+="<details><summary>Show</summary>\n\n<pre>\n${raw_log}\n</pre>\n</details>\n\n"
+        comment+="<details><summary>Show</summary>\n\n\`\`\`\n${raw_log}\n\`\`\`\n</details>\n\n"
     fi
     ((logs_collected++))
 done
