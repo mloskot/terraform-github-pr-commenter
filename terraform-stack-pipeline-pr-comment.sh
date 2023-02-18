@@ -37,7 +37,9 @@ for cmd_log in "${logs_path}"/*".${command}.txt"; do
         output+="<details><summary>Show</summary>\n\n<verbatim>\n${raw_log}\n</verbatim>\n</details>\n\n"
     fi
     ((logs_collected++))
-    break
+    if [[ $logs_collected -gt 1 ]]; then
+        break
+    fi
 done
 
 echo -e "\033[34;1mINFO:\033[0m Exporting TERRAFORM_COMMAND_PR_COMMENT environment variable"
