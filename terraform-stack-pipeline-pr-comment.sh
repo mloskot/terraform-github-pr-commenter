@@ -40,7 +40,7 @@ for cmd_log in "${logs_path}"/*".${command}.txt"; do
     # if [[ "${raw_log}" =~ "Success! The configuration is valid." ]]; then
     #     comment+="${raw_log}\n"
     # else
-    #     comment+="<details><summary>Show</summary>\n\n<verbatim>\n${raw_log}\n</verbatim>\n</details>\n\n"
+    #     comment+="<details><summary>Show</summary>\n\n<pre>\n${raw_log}\n</pre>\n</details>\n\n"
     # fi
     ((logs_collected++))
     if [[ $logs_collected -gt 1 ]]; then
@@ -51,7 +51,9 @@ comment+="</verbatim>"
 
 echo -e "\033[32;1mINFO:\033[0m Exporting TERRAFORM_COMMAND_PR_COMMENT environment variable"
 if [[ $logs_collected -gt 0 ]]; then
-    TERRAFORM_COMMAND_PR_COMMENT="${comment}"
+    # GitHub API uses \r\n as line breaks in bodies
+    # https://github.com/actions/runner/issues/1462#issuecomment-1030124116
+    TERRAFORM_COMMAND_PR_COMMENT="${comment//\\n/%0D%0A}"
 else
     TERRAFORM_COMMAND_PR_COMMENT=""
 fi
