@@ -21,6 +21,10 @@ if [[ -z "$1" ]]; then
     echo -e "\033[31;1mERROR:\033[0m Missing terraform command"
     exit 1
 fi
+if [[ ! "$1" =~ ^(fmt|plan|validate)$ ]]; then
+    echo -e "\033[31;1mERROR:\033[0m Unsupported command ${1}. Valid commands are fmt, plan, validate."
+    exit 1
+fi
 if [[ ! -d "$2" ]]; then
     echo -e "\033[31;1mERROR:\033[0m Missing path to terraform command output files"
     exit 1
