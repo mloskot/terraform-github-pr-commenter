@@ -1,7 +1,7 @@
 #!/bin/bash
-# Collect outputs of Terraform command run for the (ordered) known layers
-# and generate content of PR comment in Markdown,
-# and return it via environment variable.
+# Collect output of given Terraform command from log files in given location
+# and render it in Markdown for PR comment,
+# then return it via exported environment variable.
 if [[ $# -ne 3 ]]; then
     echo "Usage: $0 <terraform command> <path to terraform command output files> <build number>"
     exit 1
@@ -32,7 +32,7 @@ for log_file in "${logs_path}"/*".${command}.txt"; do
     layer=$(basename "${log_file}")
     layer=$(echo "${layer}" | cut -d '_' -f 2 | cut -d . -f 1)
     raw_log=$(< "${log_file}")
-    raw_log=$(echo "${raw_log}" | iconv -c -f utf-8 -t ascii | sed -E ':a;N;$!ba;s/\r{0,1}\n/\\n/g')
+    raw_log=$(echo "${raw_log}" | iconv -c -f utf-8 -t ascii//TRANSLIT | sed -E ':a;N;$!ba;s/\r{0,1}\n/\\n/g')
     # Render section for layer
     comment+="### Layer: ${layer}\n\n"
     # shellcheck disable=SC2076
