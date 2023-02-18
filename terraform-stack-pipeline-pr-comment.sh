@@ -57,7 +57,7 @@ fi
 
 if command -v "uni2ascii" &> /dev/null; then
     echo -e "\033[32;1mINFO:\033[0m Running uni2ascii to escape comment content"
-    TERRAFORM_COMMAND_PR_COMMENT=$(printf %s "$RESULT_PR_COMMENT" | uni2ascii -q -a J)
+    TERRAFORM_COMMAND_PR_COMMENT=$(printf %s "$RESULT_PR_COMMENT" | uni2ascii -q -d)
 else
     echo -e "\033[32;1mINFO:\033[0m uni2ascii not found, escaping comment content using simpler methods"
 fi
