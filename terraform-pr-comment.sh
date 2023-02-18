@@ -47,8 +47,7 @@ function _escape_content
     elif command -v "konwert" &> /dev/null; then
         echo "${1}" | konwert utf8-ascii | sed -E ':a;N;$!ba;s/\r{0,1}\n/\\n/g'
     else
-        echo -e "\033[31;1mERROR:\033[0m Missing reliable Unicode to ASCII converter for the fancy Terraform output"
-        exit 1
+        return 1
     fi
 }
 
@@ -62,13 +61,15 @@ comment="## Build \`${arg_build_number}\`: Terraform \`${arg_command}\`\n\n"
 # shellcheck disable=SC2045
 for log_file in $(ls --sort=version "${arg_logs_path}"/*."${arg_command}".{log,txt}); do
     echo -e "\033[32;1mINFO:\033[0m Rendering ${arg_command} output from ${log_file}"
-    # Section title
+    # Render section title
     section=$(basename "${log_file}")
     section=$(echo "${section}" | cut -d '_' -f 2 | cut -d . -f 1)
     comment+="### Layer: ${section}\n\n"
-    # Section content
+    # Render section content
     raw_log=$(< "${log_file}")
-    raw_log=$(_escape_content "${raw_log}")
+    set -e
+    raw_log=$(_escape_content "${raw_log}") || (echo -e "\033[31;1mERROR:\033[0m Missing reliable Unicode to ASCII converter for the fancy Terraform output"; exit 1)
+    set +e
     # shellcheck disable=SC2076
     if [[ "${raw_log}" =~ "Success! The configuration is valid." ]]; then
         comment+="${raw_log}\n"
