@@ -2,6 +2,17 @@
 # Collect output of given Terraform command from log files in given location
 # and render it in Markdown for PR comment,
 # then return it via exported environment variable.
+#
+# The script renders single comment titled with given build number and command.
+# The script supports multiple logs from multiple runs of terraform <command>,
+# e.g. separate run per directory, and each log is rendered as a separate section.
+#
+# Log file name format is: <00N>_<title>.<command>.{log,txt}
+#
+# <00N> part controls order in which files are read
+# <title> part is used as heading of section for given log
+# <command> used in the comment title together with given build number
+#
 if [[ $# -ne 3 ]]; then
     echo "Usage: $0 <terraform command> <path to terraform command output files> <build number>"
     exit 1
@@ -26,7 +37,8 @@ logs_collected=0
 
 echo -e "\033[32;1mINFO:\033[0m Rendering Terraform ${command} comment from ${logs_path}"
 comment="## Build ${build_number}: Terraform ${command}\n\n"
-for log_file in "${logs_path}"/*".${command}.txt"; do
+# shellcheck disable=SC2045
+for log_file in $(ls --sort=version "${logs_path}"/*."${command}".{log,txt}); do
     echo -e "\033[32;1mINFO:\033[0m Reading ${command} output from ${log_file}"
     # Extract name of known layer from e.g. dev_04-platform.validate.txt
     layer=$(basename "${log_file}")
@@ -42,9 +54,6 @@ for log_file in "${logs_path}"/*".${command}.txt"; do
         comment+="<details><summary>Show</summary>\n\n<pre>\n${raw_log}\n</pre>\n</details>\n\n"
     fi
     ((logs_collected++))
-    if [[ $logs_collected -gt 1 ]]; then
-        break
-    fi
 done
 comment+="\n\n"
 
