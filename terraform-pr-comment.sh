@@ -79,6 +79,22 @@ function _render_fmt
     fi
 }
 
+function _render_plan
+{
+    if [[ ! -f "${1}" ]]; then
+        return 1
+    fi
+    local raw_log
+    raw_log=$(< "${1}")
+    raw_log="${raw_log%%*( )}"
+    if [[ -n "${raw_log}" ]]; then
+        local esc_log
+        esc_log=$(_escape_content "${raw_log}")
+        # shellcheck disable=SC2028
+        echo "<details><summary>Show</summary>\n\n\`\`\`diff\n${esc_log}\n\`\`\`\n</details>\n\n"
+    fi
+}
+
 function _render_validate
 {
     if [[ ! -f "${1}" ]]; then
