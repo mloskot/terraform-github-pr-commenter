@@ -27,7 +27,7 @@ for cmd_log in "${logs_path}"/*".${command}.txt"; do
     # Extract name of known layer from e.g. dev_04-platform.validate.txt
     layer=$(basename "${cmd_log}")
     layer=$(echo "${layer}" | cut -d '_' -f 2 | cut -d . -f 1)
-    raw_log=$(< "${cmd_log//$'│'/''}")
+    raw_log=$(< "${cmd_log}")
     # Render section for layer
     output+="### Layer: ${layer}\n\n"
     # shellcheck disable=SC2076
@@ -37,6 +37,7 @@ for cmd_log in "${logs_path}"/*".${command}.txt"; do
         output+="<details><summary>Show</summary>\n\n<verbatim>\n${raw_log}\n</verbatim>\n</details>\n\n"
     fi
     ((logs_collected++))
+    break
 done
 
 echo -e "\033[34;1mINFO:\033[0m Exporting TERRAFORM_COMMAND_PR_COMMENT environment variable"
