@@ -1,0 +1,50 @@
+main.tf
+--- old/main.tf
++++ new/main.tf
+@@ -45,7 +45,7 @@
+               echo "Hello World" > /var/www/html/index.html
+               systemctl restart apache2
+               EOF
+- tags = {
++  tags = {
+     Name = var.name-learn
+   }
+ }
+@@ -80,20 +80,20 @@
+ }
+ 
+ resource "aws_security_group_rule" "allow_localhost_8080" {
+-  type = "ingress"
+-  from_port = 8080
+-  to_port = 8080                            
+-  protocol = "tcp"
+-  cidr_blocks = ["${chomp(data.http.myip.body)}/32"]
++  type              = "ingress"
++  from_port         = 8080
++  to_port           = 8080
++  protocol          = "tcp"
++  cidr_blocks       = ["${chomp(data.http.myip.body)}/32"]
+   security_group_id = aws_security_group.sg_8080.id
+ }
+ 
+ resource "aws_security_group_rule" "allow_localhost_ping" {
+-  type = "ingress"
+-  from_port = -1
+-  to_port = -1
+-  protocol = "icmp"
+-  cidr_blocks = ["${chomp(data.http.myip.body)}/32"]
++  type              = "ingress"
++  from_port         = -1
++  to_port           = -1
++  protocol          = "icmp"
++  cidr_blocks       = ["${chomp(data.http.myip.body)}/32"]
+   security_group_id = aws_security_group.sg_ping.id
+ }
+ 
+terraform.tfvars
+--- old/terraform.tfvars
++++ new/terraform.tfvars
+@@ -1,2 +1,2 @@
+-name = "terraform"
++name   = "terraform"
+ region = "us-east-2"
