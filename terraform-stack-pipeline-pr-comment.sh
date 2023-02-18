@@ -26,7 +26,7 @@ logs_collected=0
 
 echo -e "\033[32;1mINFO:\033[0m Rendering Terraform ${command} comment from ${logs_path}"
 comment="## Build ${build_number}: Terraform ${command}\n\n"
-comment="<verbatim>"
+comment+="<pre>"
 for cmd_log in "${logs_path}"/*".${command}.txt"; do
     echo -e "\033[32;1mINFO:\033[0m Reading ${command} output from ${cmd_log}"
     # Extract name of known layer from e.g. dev_04-platform.validate.txt
@@ -47,7 +47,7 @@ for cmd_log in "${logs_path}"/*".${command}.txt"; do
         break
     fi
 done
-comment+="</verbatim>"
+comment+="</pre>"
 
 echo -e "\033[32;1mINFO:\033[0m Exporting TERRAFORM_COMMAND_PR_COMMENT environment variable"
 if [[ $logs_collected -gt 0 ]]; then
