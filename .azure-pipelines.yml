@@ -31,7 +31,7 @@ steps:
         echo "YYY"
 
     - task: GitHubComment@0
-      condition: and(not(eq(variables[System.PullRequest.PullRequestId], '')), ne(variables.TERRAFORM_COMMAND_PR_COMMENT, ''))
+      condition: and(not(eq(variables['System.PullRequest.PullRequestId'], '')), ne(variables['TERRAFORM_COMMAND_PR_COMMENT'], ''))
       inputs:
         gitHubConnection: 'mloskot'
         repositoryName: '$(Build.Repository.Name)'
