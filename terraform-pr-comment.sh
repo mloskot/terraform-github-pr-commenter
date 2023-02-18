@@ -63,7 +63,7 @@ function _render_fmt
         # shellcheck disable=SC2028
         echo "<details><summary>Show</summary>\n\n\`\`\`diff\n${esc_log}\n\`\`\`\n</details>\n\n"
     else
-        echo "Success! The files are well-formed."
+        echo "Success! The files are well-formed.\n\n"
     fi
 }
 
@@ -80,7 +80,7 @@ function _render_validate
         # shellcheck disable=SC2076
         if [[ "${esc_log}" =~ "Success! The configuration is valid." ]]; then
             # shellcheck disable=SC2028
-            echo "${esc_log}\n"
+            echo "${esc_log}\n\n"
         else
             # shellcheck disable=SC2028
             echo "<details><summary>Show</summary>\n\n\`\`\`\n${esc_log}\n\`\`\`\n</details>\n\n"
