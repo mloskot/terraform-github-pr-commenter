@@ -12,7 +12,9 @@ pool:
 steps:
     # Post GitHub PR comment with validation results
     - bash: |
-        sudo apt-get install -qq - uni2ascii
+        echo '$(Build.Reason)'
+        echo '$(System.PullRequest.PullRequestNumber)'
+        echo ''
         source '$(System.DefaultWorkingDirectory)/terraform-stack-pipeline-pr-comment.sh' validate '$(System.DefaultWorkingDirectory)' '$(Build.BuildNumber)'
         echo "XXX"
         echo ${TERRAFORM_COMMAND_PR_COMMENT}
@@ -27,3 +29,10 @@ steps:
         echo "ZZZ"
         echo "$(TERRAFORM_COMMAND_PR_COMMENT)"
         echo "YYY"
+
+    - task: GitHubComment@0
+      condition: and(not(eq(variables[System.PullRequest.PullRequestNumber], '')), ne(variables.TERRAFORM_COMMAND_PR_COMMENT, ''))
+      inputs:
+        gitHubConnection: 'Cadcorp'
+        repositoryName: '$(Build.Repository.Name)'
+        comment: $(TERRAFORM_COMMAND_PR_COMMENT)
