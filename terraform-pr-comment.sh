@@ -18,35 +18,57 @@ if [[ $# -ne 3 ]]; then
     exit 1
 fi
 if [[ -z "$1" ]]; then
-    echo -e "\033[31;1mERROR:\033[0m Missing terraform command."
+    echo -e "\033[31;1mERROR:\033[0m Missing terraform command"
     exit 1
 fi
 if [[ ! -d "$2" ]]; then
-    echo -e "\033[31;1mERROR:\033[0m Missing path to terraform command output files."
+    echo -e "\033[31;1mERROR:\033[0m Missing path to terraform command output files"
     exit 1
 fi
 if [[ -z "$3" ]]; then
-    echo -e "\033[31;1mERROR:\033[0m Missing build number."
+    echo -e "\033[31;1mERROR:\033[0m Missing build number"
     exit 1
 fi
 
-command="${1}"
-logs_path="${2}"
-build_number="${3}"
+# TODO: Add more conversion methods
+if command -v "iconv" &> /dev/null; then
+    echo -e "\033[32;1mINFO:\033[0m Using iconv to escape comment content"
+elif command -v "konwert" &> /dev/null; then
+    echo -e "\033[32;1mINFO:\033[0m Using konwert to escape comment content"
+else
+    echo -e "\033[31;1mERROR:\033[0m Missing reliable Unicode to ASCII converter for the fancy Terraform output"
+    exit 1
+fi
+
+function _escape_content
+{
+    if command -v "iconv" &> /dev/null; then
+        echo "${1}" | iconv -c -f utf-8 -t ascii//TRANSLIT | sed -E ':a;N;$!ba;s/\r{0,1}\n/\\n/g'
+    elif command -v "konwert" &> /dev/null; then
+        echo "${1}" | konwert utf8-ascii | sed -E ':a;N;$!ba;s/\r{0,1}\n/\\n/g'
+    else
+        echo -e "\033[31;1mERROR:\033[0m Missing reliable Unicode to ASCII converter for the fancy Terraform output"
+        exit 1
+    fi
+}
+
+arg_command="${1}"
+arg_logs_path="${2}"
+arg_build_number="${3}"
 logs_collected=0
 
-echo -e "\033[32;1mINFO:\033[0m Rendering Terraform ${command} comment from ${logs_path}"
-comment="## Build ${build_number}: Terraform ${command}\n\n"
+echo -e "\033[32;1mINFO:\033[0m Rendering Terraform ${arg_command} comment from ${arg_logs_path}"
+comment="## Build \`${arg_build_number}\`: Terraform \`${arg_command}\`\n\n"
 # shellcheck disable=SC2045
-for log_file in $(ls --sort=version "${logs_path}"/*."${command}".{log,txt}); do
-    echo -e "\033[32;1mINFO:\033[0m Reading ${command} output from ${log_file}"
-    # Extract name of known layer from e.g. dev_04-platform.validate.txt
-    layer=$(basename "${log_file}")
-    layer=$(echo "${layer}" | cut -d '_' -f 2 | cut -d . -f 1)
+for log_file in $(ls --sort=version "${arg_logs_path}"/*."${arg_command}".{log,txt}); do
+    echo -e "\033[32;1mINFO:\033[0m Rendering ${arg_command} output from ${log_file}"
+    # Section title
+    section=$(basename "${log_file}")
+    section=$(echo "${section}" | cut -d '_' -f 2 | cut -d . -f 1)
+    comment+="### Layer: ${section}\n\n"
+    # Section content
     raw_log=$(< "${log_file}")
-    raw_log=$(echo "${raw_log}" | iconv -c -f utf-8 -t ascii//TRANSLIT | sed -E ':a;N;$!ba;s/\r{0,1}\n/\\n/g')
-    # Render section for layer
-    comment+="### Layer: ${layer}\n\n"
+    raw_log=$(_escape_content "${raw_log}")
     # shellcheck disable=SC2076
     if [[ "${raw_log}" =~ "Success! The configuration is valid." ]]; then
         comment+="${raw_log}\n"
@@ -57,6 +79,10 @@ for log_file in $(ls --sort=version "${logs_path}"/*."${command}".{log,txt}); do
 done
 comment+="\n\n"
 
+unset arg_command
+unset arg_logs_path
+unset arg_build_number
+
 echo -e "\033[32;1mINFO:\033[0m Exporting TERRAFORM_COMMAND_PR_COMMENT environment variable"
 if [[ $logs_collected -gt 0 ]]; then
     # GitHub API uses \r\n as line breaks in bodies
@@ -65,12 +91,8 @@ if [[ $logs_collected -gt 0 ]]; then
 else
     TERRAFORM_COMMAND_PR_COMMENT=""
 fi
+unset logs_collected
+unset comment
 
-# if command -v "iconv" &> /dev/null; then
-#     echo -e "\033[32;1mINFO:\033[0m Running iconv to escape comment content"
-#     TERRAFORM_COMMAND_PR_COMMENT=$(echo "$RESULT_PR_COMMENT" | iconv -c -f utf-8 -t ascii | sed -E ':a;N;$!ba;s/\r{0,1}\n/\\n/g')
-# else
-#     echo -e "\033[32;1mINFO:\033[0m iconv not found, escaping comment content using simpler methods"
-# fi
-
+echo "${TERRAFORM_COMMAND_PR_COMMENT}"
 export TERRAFORM_COMMAND_PR_COMMENT
