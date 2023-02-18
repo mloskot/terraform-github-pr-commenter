@@ -13,7 +13,7 @@ steps:
     # Post GitHub PR comment with validation results
     - bash: |
         sudo apt-get install -qq - uni2ascii
-        source '$(System.DefaultWorkingDirectory)/terraform-stack-pipeline-pr-comment.sh' validate '$(System.DefaultWorkingDirectory)'
+        source '$(System.DefaultWorkingDirectory)/terraform-stack-pipeline-pr-comment.sh' validate '$(System.DefaultWorkingDirectory)' '$(Build.BuildNumber)'
         echo "XXX"
         echo ${TERRAFORM_COMMAND_PR_COMMENT}
         echo "ZZZ"

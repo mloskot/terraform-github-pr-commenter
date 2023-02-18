@@ -21,10 +21,11 @@ fi
 
 command="${1}"
 logs_path="${2}"
+build_number="${3}"
 logs_collected=0
 
 echo -e "\033[32;1mINFO:\033[0m Rendering Terraform ${command} comment from ${logs_path}"
-output="## Build ${BUILD_BUILDNUMBER}: Terraform ${command}\n\n"
+output="## Build ${build_number}: Terraform ${command}\n\n"
 
 for cmd_log in "${logs_path}"/*".${command}.txt"; do
     echo -e "\033[32;1mINFO:\033[0m Reading ${command} output from ${cmd_log}"
