@@ -72,7 +72,7 @@ function _render_fmt
         local esc_log
         esc_log=$(_escape_content "${raw_log}")
         # shellcheck disable=SC2028
-        echo "<details><summary>Show</summary>\n\n\`\`\`diff\n${esc_log}\n\`\`\`\n</details>\n\n"
+        echo "<details><summary>Details</summary>\n\n\`\`\`diff\n${esc_log}\n\`\`\`\n</details>\n\n"
     else
         # shellcheck disable=SC2028
         echo "Success! The files are well-formed.\n\n"
@@ -81,18 +81,39 @@ function _render_fmt
 
 function _render_plan
 {
-    if [[ ! -f "${1}" ]]; then
+    local show_plan
+    local show_plan_json
+    show_plan="${1}"
+    show_plan_json="${show_plan%.*}.json"
+    if [[ ! -f "${show_plan}" ]] && [[ ! -f "${show_plan_json}" ]]; then
         return 1
     fi
-    local raw_log
-    raw_log=$(< "${1}")
-    raw_log="${raw_log%%*( )}"
-    if [[ -n "${raw_log}" ]]; then
-        local esc_log
-        esc_log=$(_escape_content "${raw_log}")
-        # shellcheck disable=SC2028
-        echo "<details><summary>Show</summary>\n\n\`\`\`diff\n${esc_log}\n\`\`\`\n</details>\n\n"
+
+    local esc_log
+    local content
+    content=""
+    # First, render summary from `terraform show -json`, if json file available
+    if [[ ! -f "${show_plan_json}" ]]; then
+        # shellcheck disable=SC2002
+        changes=$(cat "${show_plan_json}" | jq -r '[.resource_changes[]? | { resource: .address, action: .change.actions[] } | select (.action != "no-op")]')
+        summary=$(echo "${changes}" | jq -r '.   | "Environment has \(length) changes"')
+        details=$(echo "${changes}" | jq -r '.[] | "* \(.resource) will be \(.action)d"')
+        esc_log+=$(_escape_content "${details}")
+        content+="Summary: ${summary}\n\n"
+        content+="<details><summary>Details</summary>\n\n\`\`\`\n${esc_log}\n\`\`\`\n</details>\n\n"
     fi
+    # Next, render `terraform show`
+    local raw_log
+    if [[ ! -f "${show_plan}" ]]; then
+        raw_log=$(< "${1}")
+        raw_log="${raw_log%%*( )}"
+        if [[ -n "${raw_log}" ]]; then
+            esc_log=$(_escape_content "${raw_log}")
+            # shellcheck disable=SC2028
+            content+="<details><summary>Details</summary>\n\n\`\`\`diff\n${esc_log}\n\`\`\`\n</details>\n\n"
+        fi
+    fi
+    echo "${content}"
 }
 
 function _render_validate
@@ -111,7 +132,7 @@ function _render_validate
             echo "${esc_log}\n\n"
         else
             # shellcheck disable=SC2028
-            echo "<details><summary>Show</summary>\n\n\`\`\`\n${esc_log}\n\`\`\`\n</details>\n\n"
+            echo "<details><summary>Details</summary>\n\n\`\`\`\n${esc_log}\n\`\`\`\n</details>\n\n"
         fi
     fi
 }
