@@ -1,8 +1,11 @@
 # terraform-github-pr-commenter
 
 Bash script to render output of Terraform commands applicable as GitHub PR comment content.
-The rendered content can be posted by Azure Pipeline using [GitHubComment@0]() task
-or, in future, by GitHub Actions
+
+The rendered content can be posted by Azure Pipeline using
+[GitHubComment@0](https://learn.microsoft.com/en-us/azure/devops/pipelines/tasks/reference/github-comment-v0)
+task or, in future, by GitHub Actions using GitHub Script method
+[github.issues.createComment](https://github.com/actions/github-script).
 
 ## Requirements
 
@@ -11,6 +14,10 @@ or, in future, by GitHub Actions
 - Terraform command output saved in `<00N>_<title>.<command>.{log,txt}` files (see [description](#description) below).
 
 ## Usage: CLI (testing)
+
+```shell
+Usage: ./terraform-pr-comment.sh <terraform command> <path to terraform command output files> <build number>
+```
 
 ```shell
 ./terraform-pr-comment.sh validate /home/mloskot/azure-infrastructure 12345
