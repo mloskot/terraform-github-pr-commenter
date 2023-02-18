@@ -13,6 +13,10 @@ steps:
     # Post GitHub PR comment with validation results
     - bash: |
         source '$(System.DefaultWorkingDirectory)/terraform-stack-pipeline-pr-comment.sh' validate '$(System.DefaultWorkingDirectory)'
-      #  TERRAFORM_COMMAND_PR_COMMENT=${TERRAFORM_COMMAND_PR_COMMENT//\\n/%0D%0A}
-      #  echo "##vso[task.setvariable variable=TERRAFORM_COMMAND_PR_COMMENT]$TERRAFORM_COMMAND_PR_COMMENT"
+        echo "##vso[task.setvariable variable=TERRAFORM_COMMAND_PR_COMMENT]$TERRAFORM_COMMAND_PR_COMMENT"
       displayName: 'Comment PR - Terraform Validate'
+
+    - bash: |
+        echo "XXX"
+        echo $(TERRAFORM_COMMAND_PR_COMMENT)
+        echo "ZZZ"

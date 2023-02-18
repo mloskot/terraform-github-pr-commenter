@@ -41,9 +41,17 @@ done
 
 echo -e "\033[34;1mINFO:\033[0m Exporting TERRAFORM_COMMAND_PR_COMMENT environment variable"
 if [[ $logs_collected -gt 0 ]]; then
-    #TERRAFORM_COMMAND_PR_COMMENT=$(echo -e "${output}")
-    TERRAFORM_COMMAND_PR_COMMENT="${output}"
+    #RESULT_PR_COMMENT=$(echo -e "${output}")
+    RESULT_PR_COMMENT="${output}"
 else
-    TERRAFORM_COMMAND_PR_COMMENT=""
+    RESULT_PR_COMMENT=""
 fi
+
+if command -v "uni2ascii" &> /dev/null; then
+    echo -e "\033[34;1mINFO:\033[0m Running uni2ascii to escape comment content"
+else
+    echo -e "\033[34;1mINFO:\033[0m uni2ascii not found, escaping comment content using simpler methods"
+    TERRAFORM_COMMAND_PR_COMMENT=$(printf %s "$RESULT_PR_COMMENT" | uni2ascii -q -aL)
+fi
+
 export TERRAFORM_COMMAND_PR_COMMENT
