@@ -15,6 +15,8 @@
 #
 if [[ $# -ne 3 ]]; then
     echo "Usage: $0 <terraform command> <path to terraform command output files> <build number>"
+    echo "  <terraform command> is fmt, plan or validate"
+    echo "  <build number> is anything Azure Pipelines or GitHub Actions can provide"
     exit 1
 fi
 if [[ -z "$1" ]]; then
