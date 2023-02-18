@@ -1,0 +1,23 @@
+╷
+│ Warning: Deprecated Resource
+│
+│   with module.mssql.azurerm_sql_server.server,
+│   on ..\..\..\..\..\modules\azure\terraform_azurerm_db_sql\main.tf line 83, in resource "azurerm_sql_server" "server":
+│   83: resource "azurerm_sql_server" "server" {
+│
+│ The `azurerm_sql_server` resource is deprecated and will be removed in version 4.0 of the AzureRM provider. Please use the `azurerm_mssql_server` resource instead.
+│
+│ (and 3 more similar warnings elsewhere)
+╵
+╷
+│ Warning: Deprecated attribute
+│
+│   on ..\..\..\..\..\modules\azure\terraform_azurerm_diagnostics_settings\locals.tf line 16, in locals:
+│   16:     try(data.azurerm_monitor_diagnostic_categories.main[0].logs, [])
+│
+│ The attribute "logs" is deprecated. Refer to the provider documentation for details.
+│
+│ (and 7 more similar warnings elsewhere)
+╵
+Success! The configuration is valid, but there were some
+validation warnings as shown above.

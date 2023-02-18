@@ -1,0 +1,13 @@
+│ Warning: Reference to undefined provider
+│
+│   on main.tf line 220, in module "virtual_network_peering":
+│  220:     azurerm.src = azurerm
+│
+│ There is no explicit declaration for local provider name "azurerm.src" in module.virtual_network_peering, so Terraform is assuming you mean to pass a configuration for "hashicorp/azurerm".
+│
+│ If you also control the child module, add a required_providers entry named "azurerm.src" with the source address "hashicorp/azurerm".
+│
+│ (and one more similar warning elsewhere)
+╵
+Success! The configuration is valid, but there were some
+validation warnings as shown above.
