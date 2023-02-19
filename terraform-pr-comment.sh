@@ -14,13 +14,14 @@ VERSION="0.2.0"
 # <title> part is used as heading of section for given log
 # <command> used in the comment title together with given build number
 #
-if [[ $# -ne 3 ]]; then
+if [[ $# -lt 3 ]]; then
     echo "terraform-githbu-pr-commenter v${VERSION}"
     echo
-    echo "Usage: $0 <terraform command> <path to terraform command output files> <build number>"
+    echo "Usage: $0 <terraform command> <path to terraform command output files> <build number> [build url]"
     echo
     echo "  <terraform command> is fmt, plan or validate"
     echo "  <build number> is anything Azure Pipelines or GitHub Actions can provide"
+    echo "  [build url] optional, URL to results of current build to be added to comment"
     echo
     exit 1
 fi
@@ -39,6 +40,9 @@ fi
 if [[ -z "$3" ]]; then
     echo -e "\033[31;1mERROR:\033[0m Missing build number"
     exit 1
+fi
+if [[ -n "$4" ]]; then
+    echo -e "\033[32;1mINFO:\033[0m Using passed build URL $4"
 fi
 
 # TODO: Add more conversion methods
@@ -152,10 +156,15 @@ function _render_validate
 arg_command="${1}"
 arg_logs_path="${2}"
 arg_build_number="${3}"
+arg_build_url="${4}"
 logs_collected=0
 
 echo -e "\033[32;1mINFO:\033[0m Rendering Terraform ${arg_command} comment from ${arg_logs_path}"
-comment="## Build \`${arg_build_number}\`: Terraform \`${arg_command}\`\n\n"
+if [[ -n "${arg_build_url}" ]]; then
+    comment="## Build [${arg_build_number}](${arg_build_url}): Terraform \`${arg_command}\`\n\n"
+else
+    comment="## Build \`${arg_build_number}\`: Terraform \`${arg_command}\`\n\n"
+fi
 # shellcheck disable=SC2045
 for log_file in $(ls --sort=version "${arg_logs_path}"/*."${arg_command}".{log,txt} 2>/dev/null); do
     echo -e "\033[32;1mINFO:\033[0m Rendering ${arg_command} output from ${log_file}"
