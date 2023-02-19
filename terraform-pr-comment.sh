@@ -167,7 +167,7 @@ else
 fi
 
 # Open outer <details>
-comment+="<details><summary>Build Details</summary>"
+comment+="<details><summary>Build Details</summary>\n\n"
 
 # shellcheck disable=SC2045
 for log_file in $(ls --sort=version "${arg_logs_path}"/*."${arg_command}".{log,txt} 2>/dev/null); do
