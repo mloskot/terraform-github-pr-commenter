@@ -18,7 +18,7 @@ task or, in future, by GitHub Actions using GitHub Script method
 ## Usage: CLI (testing)
 
 ```shell
-Usage: ./terraform-pr-comment.sh <terraform command> <path to terraform command output files> <build number>
+Usage: ./terraform-pr-comment.sh <terraform command> <path to terraform command output files> <build number> [build url]
 ```
 
 ```shell
