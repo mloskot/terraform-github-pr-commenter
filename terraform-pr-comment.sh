@@ -93,7 +93,7 @@ function _render_plan
     if [[ -f "${show_plan_json}" ]]; then
         # shellcheck disable=SC2002
         changes=$(cat "${show_plan_json}" | jq -r '[.resource_changes[]? | { resource: .address, action: .change.actions[] } | select (.action != "no-op")]')
-        summary=$(echo "${changes}" | jq -r '.   | "Environment has \(length) changes"')
+        summary=$(echo "${changes}" | jq -r '.   | "Plan will apply \(length) changes"')
         details=$(echo "${changes}" | jq -r '.[] | "* \(.resource) will be \(.action)d"')
         esc_log+=$(_escape_content "${details}")
         content+="Summary: ${summary}\n\n"
