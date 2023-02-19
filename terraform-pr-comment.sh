@@ -41,6 +41,10 @@ if [[ -z "$3" ]]; then
     echo -e "\033[31;1mERROR:\033[0m Missing build number"
     exit 1
 fi
+if [[ -n "$4" ]]; then
+    echo -e "\033[32;1mINFO:\033[0m Using passed build URL $4"
+fi
+exit 0
 
 # TODO: Add more conversion methods
 if command -v "iconv" &> /dev/null; then
