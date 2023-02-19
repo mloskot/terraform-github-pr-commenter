@@ -70,7 +70,7 @@ function _render_html_details_summary
 {
     title="${1}"
     if [[ -z "${title}" ]]; then
-        title="Component Details"
+        title="Details"
     fi
     # shellcheck disable=SC2028
     echo "<summary><strong>${title}</strong></summary>\n\n"
