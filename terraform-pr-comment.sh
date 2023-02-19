@@ -81,17 +81,14 @@ function _render_fmt
 
 function _render_plan
 {
-    local show_plan
-    local show_plan_json
+    local show_plan show_plan_json
     show_plan="${1}"
     show_plan_json="${show_plan%.*}.json"
     if [[ ! -f "${show_plan}" ]] && [[ ! -f "${show_plan_json}" ]]; then
         return 1
     fi
 
-    local esc_log
-    local content
-    content=""
+    local content="" changes="" summary=""
     # First, render summary from `terraform show -json`, if json file available
     if [[ -f "${show_plan_json}" ]]; then
         # shellcheck disable=SC2002
