@@ -64,7 +64,7 @@ function _escape_content
     fi
 }
 
-function _render_fmt
+function _render_command_fmt
 {
     if [[ ! -f "${1}" ]]; then
         return 1
@@ -83,7 +83,7 @@ function _render_fmt
     fi
 }
 
-function _render_plan
+function _render_command_plan
 {
     local show_plan show_plan_json
     show_plan="${1}"
@@ -132,7 +132,7 @@ function _render_plan
     echo "${content}"
 }
 
-function _render_validate
+function _render_command_validate
 {
     if [[ ! -f "${1}" ]]; then
         return 1
@@ -177,7 +177,7 @@ for log_file in $(ls --sort=version "${arg_logs_path}"/*."${arg_command}".{log,t
     section=$(echo "${section}" | cut -d '_' -f 2 | cut -d . -f 1)
     comment+="### Layer: \`${section}\`\n\n"
     # Render section content
-    content=$(_render_"${arg_command}"  "${log_file}")
+    content=$(_render_command_"${arg_command}"  "${log_file}")
     if [[ -z "${content}" ]]; then
         set -e
         echo -e "\033[31;1mERROR:\033[0m Rendering ${arg_command} output failed"
