@@ -1,11 +1,8 @@
 # terraform-github-pr-commenter
 
-Bash script to render output of Terraform commands applicable as GitHub PR comment content.
-
-The rendered content can be posted by Azure Pipeline using
-[GitHubComment@0](https://learn.microsoft.com/en-us/azure/devops/pipelines/tasks/reference/github-comment-v0)
-task or, in future, by GitHub Actions using GitHub Script method
-[github.issues.createComment](https://github.com/actions/github-script).
+Bash script to render Terraform command output as GitHub Pull Request comment
+ready to be posted from any CI/CD agent that can be authenticated with GitHub,
+for example, Azure Pipelines or GitHub Actions.
 
 ## Requirements
 
@@ -31,14 +28,20 @@ Usage: ./terraform-pr-comment.sh <terraform command> <path to terraform command 
 
 ## Description
 
-Collect output of given Terraform command from log files in given location
-and render it in Markdown for PR comment,
-then return it via exported environment variable.
+The script collects Terraform command outputs from log files in given location,
+combines them and renders in Markdown as content for GitHub Pull Request comment,
+and returns via exported environment variable.
 
 The script renders single comment titled with given build number and command.
 
-The script supports multiple logs from multiple runs of terraform `<command>`,
-e.g. separate run per directory, and each log is rendered as a separate section.
+The script can read multiple log files from number of runs of the same Terraform
+command - one run per component of layer of user's infrastructure
+Each run is rendered as separate section with its own sub-title.
+
+The rendered content can be posted by Azure Pipeline using
+[GitHubComment@0](https://learn.microsoft.com/en-us/azure/devops/pipelines/tasks/reference/github-comment-v0)
+task or by GitHub Actions using GitHub Script method
+[github.issues.createComment](https://github.com/actions/github-script).
 
 Log file name format is `<00N>_<title>.<command>.{log,txt}` where
 
@@ -46,7 +49,8 @@ Log file name format is `<00N>_<title>.<command>.{log,txt}` where
 - `<title>` part is used as heading of section for given log
 - `<command>` used in the comment title together with given build number
 
-Notice, that unlike other solutions like [terraform-pr-commenter](https://github.com/robburger/terraform-pr-commenter),
+Notice, that unlike other solutions like
+[terraform-pr-commenter](https://github.com/robburger/terraform-pr-commenter),
 this script does not search and delete any previous comment it posted.
 This script always posts a new comment for new build result.
 It is a very simple script.
