@@ -88,7 +88,7 @@ function _render_plan
         return 1
     fi
 
-    local content
+    local content esc_log
     content=""
     # First, render summary from `terraform show -json`, if json file available
     if [[ -f "${show_plan_json}" ]]; then
@@ -97,10 +97,10 @@ function _render_plan
         changes=$(cat "${show_plan_json}" | jq -r '[.resource_changes[]? | { resource: .address, action: .change.actions[] } | select (.action != "no-op")]')
         summary=$(echo "${changes}" | jq -r '.   | "Plan will apply \(length) changes"')
         details=$(echo "${changes}" | jq -r '.[] | "* \(.resource) will be \(.action)d"')
-        details+=$(_escape_content "${details}")
+        esc_log+=$(_escape_content "${details}")
         content+="${summary}\n\n"
         if [[ -n "${details}" ]]; then
-            content+="<details><summary>Details</summary>\n\n\`\`\`\n${details}\n\`\`\`\n</details>\n\n"
+            content+="<details><summary>Details</summary>\n\n\`\`\`\n${esc_log}\n\`\`\`\n</details>\n\n"
         fi
     fi
     # Next, render `terraform show`
