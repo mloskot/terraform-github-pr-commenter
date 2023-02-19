@@ -161,9 +161,9 @@ logs_collected=0
 
 echo -e "\033[32;1mINFO:\033[0m Rendering Terraform ${arg_command} comment from ${arg_logs_path}"
 if [[ -n "${arg_build_url}" ]]; then
-    comment="## Build U [${arg_build_number}](${arg_build_url}): Terraform \`${arg_command}\`\n\n"
+    comment="## Build [${arg_build_number}](${arg_build_url}): Terraform \`${arg_command}\`\n\n"
 else
-    comment="## Build X \`${arg_build_number}\`: Terraform \`${arg_command}\`\n\n"
+    comment="## Build \`${arg_build_number}\`: Terraform \`${arg_command}\`\n\n"
 fi
 # shellcheck disable=SC2045
 for log_file in $(ls --sort=version "${arg_logs_path}"/*."${arg_command}".{log,txt} 2>/dev/null); do
