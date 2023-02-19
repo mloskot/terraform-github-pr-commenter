@@ -88,11 +88,11 @@ function _render_plan
         return 1
     fi
 
-    local content esc_log
+    local content esc_log summary
     content=""
     # First, render summary from `terraform show -json`, if json file available
     if [[ -f "${show_plan_json}" ]]; then
-        local changes summary
+        local changes details
         # shellcheck disable=SC2002
         changes=$(cat "${show_plan_json}" | jq -r '[.resource_changes[]? | { resource: .address, action: .change.actions[] } | select (.action != "no-op")]')
         summary=$(echo "${changes}" | jq -r '.   | "Plan will apply \(length) changes"')
@@ -117,9 +117,11 @@ function _render_plan
             raw_log=$(echo "${raw_log}" | sed -r '/Plan: /q') # Ignore everything after plan summary
             raw_log=${raw_log::65300} # GitHub has a 65535-char comment limit - truncate plan, leaving space for comment wrapper
             raw_log=$(echo "${raw_log}" | sed -r 's/^([[:blank:]]*)([-+~])/\2\1/g') # Move any diff characters to start of line
-            summary=$(echo "${raw_log}" | tail -n 1) # Plan: is the last line now
+            summary=$(echo "${raw_log}" | grep -E "^Plan\:.+$" | tail -n 1) # Extract Plan: line from diff summary (may not be present)
             esc_log=$(_escape_content "${raw_log}")
-            content+="XXX ${summary}\n\n"
+            if [[ -n "${summary}" ]]; then
+                content+="${summary}\n\n"
+            fi
             content+="<details><summary>Details</summary>\n\n\`\`\`diff\n${esc_log}\n\`\`\`\n</details>\n\n"
         fi
     fi
