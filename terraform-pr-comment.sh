@@ -106,6 +106,8 @@ function _render_plan
     local raw_log
     if [[ -f "${show_plan}" ]]; then
         raw_log=$(< "${1}")
+        # shellcheck disable=SC2001
+        raw_log=$(echo "${raw_log}" | sed 's/\x1b\[[0-9;]*m//g')
         # Trim leading and trailing empty lines
         raw_log=$(echo "${raw_log}" | sed -e '/./,$!d' -e :a -e '/^\n*$/{$d;N;ba' -e '}')
         if [[ -n "${raw_log}" ]]; then
