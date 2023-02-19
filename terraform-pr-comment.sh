@@ -165,6 +165,10 @@ if [[ -n "${arg_build_url}" ]]; then
 else
     comment="## Build \`${arg_build_number}\`: Terraform \`${arg_command}\`\n\n"
 fi
+
+# Open outer <details>
+comment+="<details><summary>Build Details</summary>"
+
 # shellcheck disable=SC2045
 for log_file in $(ls --sort=version "${arg_logs_path}"/*."${arg_command}".{log,txt} 2>/dev/null); do
     echo -e "\033[32;1mINFO:\033[0m Rendering ${arg_command} output from ${log_file}"
@@ -183,7 +187,9 @@ for log_file in $(ls --sort=version "${arg_logs_path}"/*."${arg_command}".{log,t
 
     ((logs_collected++))
 done
-comment+="\n\n"
+
+# Close outer <details>
+comment+="</details>\n"
 
 unset arg_command
 unset arg_logs_path
