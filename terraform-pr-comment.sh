@@ -72,11 +72,60 @@ function _render_fmt
         local esc_log
         esc_log=$(_escape_content "${raw_log}")
         # shellcheck disable=SC2028
-        echo "<details><summary>Show</summary>\n\n\`\`\`diff\n${esc_log}\n\`\`\`\n</details>\n\n"
+        echo "<details><summary>Details</summary>\n\n\`\`\`diff\n${esc_log}\n\`\`\`\n</details>\n\n"
     else
         # shellcheck disable=SC2028
         echo "Success! The files are well-formed.\n\n"
     fi
+}
+
+function _render_plan
+{
+    local show_plan show_plan_json
+    show_plan="${1}"
+    show_plan_json="${show_plan%.*}.json"
+    if [[ ! -f "${show_plan}" ]] && [[ ! -f "${show_plan_json}" ]]; then
+        return 1
+    fi
+
+    local content esc_log summary
+    content=""
+    # First, render summary from `terraform show -json`, if json file available
+    if [[ -f "${show_plan_json}" ]]; then
+        local changes details
+        # shellcheck disable=SC2002
+        changes=$(cat "${show_plan_json}" | jq -r '[.resource_changes[]? | { resource: .address, action: .change.actions[] } | select (.action != "no-op")]')
+        summary=$(echo "${changes}" | jq -r '.   | "Plan will apply \(length) changes"')
+        details=$(echo "${changes}" | jq -r '.[] | "* \(.resource) will be \(.action)d"')
+        esc_log+=$(_escape_content "${details}")
+        content+="${summary}\n\n"
+        if [[ -n "${details}" ]]; then
+            content+="<details><summary>Details</summary>\n\n\`\`\`\n${esc_log}\n\`\`\`\n</details>\n\n"
+        fi
+    fi
+    # Next, render `terraform show`
+    if [[ -f "${show_plan}" ]]; then
+        local raw_log
+        raw_log=$(< "${1}")
+        # shellcheck disable=SC2001
+        raw_log=$(echo "${raw_log}" | sed 's/\x1b\[[0-9;]*m//g')
+        # Trim leading and trailing empty lines
+        raw_log=$(echo "${raw_log}" | sed -e '/./,$!d' -e :a -e '/^\n*$/{$d;N;ba' -e '}')
+        if [[ -n "${raw_log}" ]]; then
+            # Plan clean up rules stolen from https://github.com/gunkow/terraform-pr-commenter
+            raw_log=$(echo "${raw_log}" | sed -r '/^(An execution plan has been generated and is shown below.|Terraform used the selected providers to generate the following execution|plan. Resource actions are indicated with the following symbols:|No changes. Infrastructure is up-to-date.|No changes. Your infrastructure matches the configuration.|Note: Objects have changed outside of Terraform)$/d') # Strip refresh section
+            raw_log=$(echo "${raw_log}" | sed -r '/Plan: /q') # Ignore everything after plan summary
+            raw_log=${raw_log::65300} # GitHub has a 65535-char comment limit - truncate plan, leaving space for comment wrapper
+            raw_log=$(echo "${raw_log}" | sed -r 's/^([[:blank:]]*)([-+~])/\2\1/g') # Move any diff characters to start of line
+            summary=$(echo "${raw_log}" | grep -E "^Plan\:.+$" | tail -n 1) # Extract Plan: line from diff summary (may not be present)
+            esc_log=$(_escape_content "${raw_log}")
+            if [[ -n "${summary}" ]]; then
+                content+="${summary}\n\n"
+            fi
+            content+="<details><summary>Details</summary>\n\n\`\`\`diff\n${esc_log}\n\`\`\`\n</details>\n\n"
+        fi
+    fi
+    echo "${content}"
 }
 
 function _render_validate
@@ -95,7 +144,7 @@ function _render_validate
             echo "${esc_log}\n\n"
         else
             # shellcheck disable=SC2028
-            echo "<details><summary>Show</summary>\n\n\`\`\`\n${esc_log}\n\`\`\`\n</details>\n\n"
+            echo "<details><summary>Details</summary>\n\n\`\`\`\n${esc_log}\n\`\`\`\n</details>\n\n"
         fi
     fi
 }

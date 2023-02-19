@@ -23,7 +23,7 @@ Usage: ./terraform-pr-comment.sh <terraform command> <path to terraform command 
 ./terraform-pr-comment.sh validate /home/mloskot/azure-infrastructure 12345
 ```
 
-## Usage: CI
+## Usage: CI/CD
 
 - for Azure Pipelines example see [.azure-pipelines.yml](.azure-pipelines.yml)
 
@@ -48,6 +48,10 @@ Notice, that unlike other solutions like [terraform-pr-commenter](https://github
 this script does not search and delete any previous comment it posted.
 This script always posts a new comment for new build result.
 It is a very simple script.
+
+## Preparing Logs
+
+*TODO:* Explain how to prepare log files as valid input for this script.
 
 ## Credits
 

@@ -1,0 +1,560 @@
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  + create
+  - destroy
+-/+ destroy and then create replacement
+ <= read (data resources)
+
+Terraform will perform the following actions:
+
+  # azurerm_private_dns_zone.private_dns_zone must be replaced
+-/+ resource "azurerm_private_dns_zone" "private_dns_zone" {
+      ~ id                                                    = "/subscriptions/1b298c01-0747-469e-8955-af1486a97bc4/resourceGroups/rg-base-example-dev/providers/Microsoft.Network/privateDnsZones/example.dev" -> (known after apply)
+      ~ max_number_of_record_sets                             = 25000 -> (known after apply)
+      ~ max_number_of_virtual_network_links                   = 1000 -> (known after apply)
+      ~ max_number_of_virtual_network_links_with_registration = 100 -> (known after apply)
+      ~ name                                                  = "example.dev" -> "demo.dev" # forces replacement
+      ~ number_of_record_sets                                 = 1 -> (known after apply)
+      ~ resource_group_name                                   = "rg-base-example-dev" -> (known after apply) # forces replacement
+      ~ tags                                                  = {
+          ~ "owner"       = "example" -> "demo"
+            # (2 unchanged elements hidden)
+        }
+
+      ~ soa_record {
+          ~ email         = "azureprivatedns-host.microsoft.com" -> (known after apply)
+          ~ expire_time   = 2419200 -> (known after apply)
+          ~ fqdn          = "example.dev." -> (known after apply)
+          ~ host_name     = "azureprivatedns.net" -> (known after apply)
+          ~ minimum_ttl   = 10 -> (known after apply)
+          ~ refresh_time  = 3600 -> (known after apply)
+          ~ retry_time    = 300 -> (known after apply)
+          ~ serial_number = 1 -> (known after apply)
+          ~ tags          = {} -> (known after apply)
+          ~ ttl           = 3600 -> (known after apply)
+        }
+    }
+
+  # module.container_registry.azurecaf_name.acr must be replaced
+-/+ resource "azurecaf_name" "acr" {
+      ~ id            = "pfdmpfpdlciiuheh" -> (known after apply)
+        name          = "base"
+      ~ result        = "crexample" -> (known after apply)
+      ~ results       = {} -> (known after apply)
+      ~ suffixes      = [ # forces replacement
+          - "example",
+          + "demo",
+            "uks",
+            # (1 unchanged element hidden)
+        ]
+        # (6 unchanged attributes hidden)
+    }
+
+  # module.container_registry.azurerm_container_registry.registry must be replaced
+-/+ resource "azurerm_container_registry" "registry" {
+      ~ admin_password                = (sensitive value)
+      ~ admin_username                = "crexample" -> (known after apply)
+      - anonymous_pull_enabled        = false -> null
+      - data_endpoint_enabled         = false -> null
+      ~ encryption                    = [
+          - {
+              - enabled            = false
+              - identity_client_id = ""
+              - key_vault_key_id   = ""
+            },
+        ] -> (known after apply)
+      ~ id                            = "/subscriptions/1b298c01-0747-469e-8955-af1486a97bc4/resourceGroups/rg-base-example-dev/providers/Microsoft.ContainerRegistry/registries/crexample" -> (known after apply)
+      ~ login_server                  = "crexample.azurecr.io" -> (known after apply)
+      ~ name                          = "crexample" -> (known after apply) # forces replacement
+      ~ network_rule_set              = [
+          - {
+              - default_action  = "Allow"
+              - ip_rule         = []
+              - virtual_network = []
+            },
+        ] -> (known after apply)
+      - quarantine_policy_enabled     = false -> null
+      ~ resource_group_name           = "rg-base-example-dev" -> (known after apply) # forces replacement
+      ~ retention_policy              = [
+          - {
+              - days    = 7
+              - enabled = false
+            },
+        ] -> (known after apply)
+      ~ tags                          = {
+          ~ "owner" = "example" -> "demo"
+            # (2 unchanged elements hidden)
+        }
+      ~ trust_policy                  = [
+          - {
+              - enabled = false
+            },
+        ] -> (known after apply)
+        # (7 unchanged attributes hidden)
+    }
+
+  # module.keyvault.azurecaf_name.keyvault must be replaced
+-/+ resource "azurecaf_name" "keyvault" {
+      ~ id            = "ohetjyrybvqoxtwf" -> (known after apply)
+        name          = "base"
+      ~ result        = "kv-base-example-uks-dev" -> (known after apply)
+      ~ results       = {} -> (known after apply)
+      ~ suffixes      = [ # forces replacement
+          - "example",
+          + "demo",
+            "uks",
+            # (1 unchanged element hidden)
+        ]
+        # (6 unchanged attributes hidden)
+    }
+
+  # module.keyvault.azurerm_key_vault.keyvault must be replaced
+-/+ resource "azurerm_key_vault" "keyvault" {
+      ~ access_policy                   = [
+          - {
+              - application_id          = ""
+              - certificate_permissions = [
+                  - "Get",
+                  - "List",
+                  - "Update",
+                  - "Create",
+                  - "Import",
+                  - "Delete",
+                  - "Recover",
+                  - "Backup",
+                  - "Restore",
+                  - "ManageContacts",
+                  - "ManageIssuers",
+                  - "GetIssuers",
+                  - "ListIssuers",
+                  - "SetIssuers",
+                  - "DeleteIssuers",
+                ]
+              - key_permissions         = [
+                  - "Get",
+                  - "List",
+                  - "Update",
+                  - "Create",
+                  - "Import",
+                  - "Delete",
+                  - "Recover",
+                  - "Backup",
+                  - "Restore",
+                  - "GetRotationPolicy",
+                  - "SetRotationPolicy",
+                  - "Rotate",
+                ]
+              - object_id               = "18b6a0ca-6584-46de-9095-b373ffba4acc"
+              - secret_permissions      = [
+                  - "Get",
+                  - "List",
+                  - "Set",
+                  - "Delete",
+                  - "Recover",
+                  - "Backup",
+                  - "Restore",
+                ]
+              - storage_permissions     = []
+              - tenant_id               = "bc1095a9-bbd6-44bb-9434-d899022f9dc3"
+            },
+          - {
+              - application_id          = ""
+              - certificate_permissions = [
+                  - "Get",
+                  - "List",
+                  - "Update",
+                  - "Create",
+                  - "Import",
+                  - "Delete",
+                  - "Recover",
+                  - "Backup",
+                  - "Restore",
+                  - "ManageContacts",
+                  - "ManageIssuers",
+                  - "GetIssuers",
+                  - "ListIssuers",
+                  - "SetIssuers",
+                  - "DeleteIssuers",
+                ]
+              - key_permissions         = [
+                  - "Get",
+                  - "List",
+                  - "Update",
+                  - "Create",
+                  - "Import",
+                  - "Delete",
+                  - "Recover",
+                  - "Backup",
+                  - "Restore",
+                  - "GetRotationPolicy",
+                  - "SetRotationPolicy",
+                  - "Rotate",
+                ]
+              - object_id               = "266565d1-ef85-4b32-867d-5d8a405dabf1"
+              - secret_permissions      = [
+                  - "Get",
+                  - "List",
+                  - "Set",
+                  - "Delete",
+                  - "Recover",
+                  - "Backup",
+                  - "Restore",
+                ]
+              - storage_permissions     = []
+              - tenant_id               = "bc1095a9-bbd6-44bb-9434-d899022f9dc3"
+            },
+          - {
+              - application_id          = ""
+              - certificate_permissions = []
+              - key_permissions         = []
+              - object_id               = "8785da90-903a-454c-8d57-dfcf4ee30a90"
+              - secret_permissions      = [
+                  - "Get",
+                  - "List",
+                ]
+              - storage_permissions     = []
+              - tenant_id               = "bc1095a9-bbd6-44bb-9434-d899022f9dc3"
+            },
+        ] -> (known after apply)
+      ~ enable_rbac_authorization       = true -> false
+      ~ id                              = "/subscriptions/1b298c01-0747-469e-8955-af1486a97bc4/resourceGroups/rg-base-example-dev/providers/Microsoft.KeyVault/vaults/kv-base-example-uks-dev" -> (known after apply)
+      ~ name                            = "kv-base-example-uks-dev" -> (known after apply) # forces replacement
+      ~ resource_group_name             = "rg-base-example-dev" -> (known after apply) # forces replacement
+      ~ tags                            = {
+          ~ "owner" = "example" -> "demo"
+            # (2 unchanged elements hidden)
+        }
+      ~ vault_uri                       = "https://kv-base-example-uks-dev.vault.azure.net/" -> (known after apply)
+        # (9 unchanged attributes hidden)
+
+      ~ network_acls {
+          - ip_rules                   = [] -> null
+          - virtual_network_subnet_ids = [] -> null
+            # (2 unchanged attributes hidden)
+        }
+    }
+
+  # module.keyvault.azurerm_key_vault_access_policy.admin_policy["690e2167-e552-4c9f-9d3e-92d7efc272ba"] will be created
+  + resource "azurerm_key_vault_access_policy" "admin_policy" {
+      + certificate_permissions = [
+          + "Backup",
+          + "Create",
+          + "Delete",
+          + "DeleteIssuers",
+          + "Get",
+          + "GetIssuers",
+          + "Import",
+          + "List",
+          + "ListIssuers",
+          + "ManageContacts",
+          + "ManageIssuers",
+          + "Purge",
+          + "Recover",
+          + "Restore",
+          + "SetIssuers",
+          + "Update",
+        ]
+      + id                      = (known after apply)
+      + key_permissions         = [
+          + "Backup",
+          + "Create",
+          + "Decrypt",
+          + "Delete",
+          + "Encrypt",
+          + "Get",
+          + "Import",
+          + "List",
+          + "Purge",
+          + "Recover",
+          + "Restore",
+          + "Sign",
+          + "UnwrapKey",
+          + "Update",
+          + "Verify",
+          + "WrapKey",
+        ]
+      + key_vault_id            = (known after apply)
+      + object_id               = "690e2167-e552-4c9f-9d3e-92d7efc272ba"
+      + secret_permissions      = [
+          + "Backup",
+          + "Delete",
+          + "Get",
+          + "List",
+          + "Purge",
+          + "Recover",
+          + "Restore",
+          + "Set",
+        ]
+      + tenant_id               = "bc1095a9-bbd6-44bb-9434-d899022f9dc3"
+    }
+
+  # module.keyvault.azurerm_role_assignment.rbac_keyvault_administrator["ae622e27-c608-4875-9d25-4ff8b6273682"] will be destroyed
+  # (because key ["ae622e27-c608-4875-9d25-4ff8b6273682"] is not in for_each map)
+  - resource "azurerm_role_assignment" "rbac_keyvault_administrator" {
+      - id                   = "/subscriptions/1b298c01-0747-469e-8955-af1486a97bc4/resourceGroups/rg-base-example-dev/providers/Microsoft.KeyVault/vaults/kv-base-example-uks-dev/providers/Microsoft.Authorization/roleAssignments/377069dd-71d8-9a6b-02af-0da3d8b56e1f" -> null
+      - name                 = "377069dd-71d8-9a6b-02af-0da3d8b56e1f" -> null
+      - principal_id         = "ae622e27-c608-4875-9d25-4ff8b6273682" -> null
+      - principal_type       = "Group" -> null
+      - role_definition_id   = "/subscriptions/1b298c01-0747-469e-8955-af1486a97bc4/providers/Microsoft.Authorization/roleDefinitions/00482a5a-887f-4fb3-b363-3b7fe8e74483" -> null
+      - role_definition_name = "Key Vault Administrator" -> null
+      - scope                = "/subscriptions/1b298c01-0747-469e-8955-af1486a97bc4/resourceGroups/rg-base-example-dev/providers/Microsoft.KeyVault/vaults/kv-base-example-uks-dev" -> null
+    }
+
+  # module.log_analytics.data.external.generate_storage_sas_token will be read during apply
+  # (config refers to values not yet known)
+ <= data "external" "generate_storage_sas_token" {
+      + id      = (known after apply)
+      + program = [
+          + "bash",
+          + "../../../../../modules/azure/terraform_azurerm_log_analytics/files/script_sas_token.sh",
+        ]
+      + query   = {
+          + "permissions_account"       = "wlacu"
+          + "permissions_container"     = "dlrw"
+          + "resources_types"           = "sco"
+          + "services"                  = "bfqt"
+          + "storage_account_name"      = (known after apply)
+          + "storage_connection_string" = (sensitive value)
+          + "storage_container"         = ""
+          + "token_expiry"              = "2042-01-01T00:00:00Z"
+        }
+      + result  = (known after apply)
+    }
+
+  # module.log_analytics.azurecaf_name.log_analytics_workspace must be replaced
+-/+ resource "azurecaf_name" "log_analytics_workspace" {
+      ~ id            = "hchrmxccvssatmau" -> (known after apply)
+        name          = "base"
+      ~ result        = "log-base-example-uks-dev" -> (known after apply)
+      ~ results       = {} -> (known after apply)
+      ~ suffixes      = [ # forces replacement
+          - "example",
+          + "demo",
+            "uks",
+            # (1 unchanged element hidden)
+        ]
+        # (6 unchanged attributes hidden)
+    }
+
+  # module.log_analytics.azurerm_advanced_threat_protection.storage_threat_protection must be replaced
+-/+ resource "azurerm_advanced_threat_protection" "storage_threat_protection" {
+      ~ id                 = "/subscriptions/1b298c01-0747-469e-8955-af1486a97bc4/resourceGroups/rg-base-example-dev/providers/Microsoft.Storage/storageAccounts/examplelog/providers/Microsoft.Security/advancedThreatProtectionSettings/current" -> (known after apply)
+      ~ target_resource_id = "/subscriptions/1b298c01-0747-469e-8955-af1486a97bc4/resourceGroups/rg-base-example-dev/providers/Microsoft.Storage/storageAccounts/examplelog" -> (known after apply) # forces replacement
+        # (1 unchanged attribute hidden)
+    }
+
+  # module.log_analytics.azurerm_log_analytics_workspace.log_workspace must be replaced
+-/+ resource "azurerm_log_analytics_workspace" "log_workspace" {
+      - cmk_for_query_forced               = false -> null
+      ~ id                                 = "/subscriptions/1b298c01-0747-469e-8955-af1486a97bc4/resourceGroups/rg-base-example-dev/providers/Microsoft.OperationalInsights/workspaces/log-base-example-uks-dev" -> (known after apply)
+      ~ name                               = "log-base-example-uks-dev" -> (known after apply) # forces replacement
+      ~ primary_shared_key                 = (sensitive value)
+      + reservation_capacity_in_gb_per_day = (known after apply)
+      ~ resource_group_name                = "rg-base-example-dev" -> (known after apply) # forces replacement
+      ~ secondary_shared_key               = (sensitive value)
+      ~ tags                               = {
+          + "new-tag" = "false"
+          ~ "owner"   = "example" -> "demo"
+            # (2 unchanged elements hidden)
+        }
+      ~ workspace_id                       = "a2b30f78-78d2-4c3e-8119-0dc377552fc2" -> (known after apply)
+        # (8 unchanged attributes hidden)
+    }
+
+  # module.log_analytics.azurerm_storage_account.storage_logs must be replaced
+-/+ resource "azurerm_storage_account" "storage_logs" {
+      ~ access_tier                       = "Hot" -> (known after apply)
+      ~ id                                = "/subscriptions/1b298c01-0747-469e-8955-af1486a97bc4/resourceGroups/rg-base-example-dev/providers/Microsoft.Storage/storageAccounts/examplelog" -> (known after apply)
+      + large_file_share_enabled          = (known after apply)
+        name                              = "examplelog"
+      ~ primary_access_key                = (sensitive value)
+      ~ primary_blob_connection_string    = (sensitive value)
+      ~ primary_blob_endpoint             = "https://examplelog.blob.core.windows.net/" -> (known after apply)
+      ~ primary_blob_host                 = "examplelog.blob.core.windows.net" -> (known after apply)
+      ~ primary_connection_string         = (sensitive value)
+      ~ primary_dfs_endpoint              = "https://examplelog.dfs.core.windows.net/" -> (known after apply)
+      ~ primary_dfs_host                  = "examplelog.dfs.core.windows.net" -> (known after apply)
+      ~ primary_file_endpoint             = "https://examplelog.file.core.windows.net/" -> (known after apply)
+      ~ primary_file_host                 = "examplelog.file.core.windows.net" -> (known after apply)
+      ~ primary_location                  = "uksouth" -> (known after apply)
+      ~ primary_queue_endpoint            = "https://examplelog.queue.core.windows.net/" -> (known after apply)
+      ~ primary_queue_host                = "examplelog.queue.core.windows.net" -> (known after apply)
+      ~ primary_table_endpoint            = "https://examplelog.table.core.windows.net/" -> (known after apply)
+      ~ primary_table_host                = "examplelog.table.core.windows.net" -> (known after apply)
+      ~ primary_web_endpoint              = "https://examplelog.z33.web.core.windows.net/" -> (known after apply)
+      ~ primary_web_host                  = "examplelog.z33.web.core.windows.net" -> (known after apply)
+      ~ resource_group_name               = "rg-base-example-dev" -> (known after apply) # forces replacement
+      ~ secondary_access_key              = (sensitive value)
+      + secondary_blob_connection_string  = (sensitive value)
+      + secondary_blob_endpoint           = (known after apply)
+      + secondary_blob_host               = (known after apply)
+      ~ secondary_connection_string       = (sensitive value)
+      + secondary_dfs_endpoint            = (known after apply)
+      + secondary_dfs_host                = (known after apply)
+      + secondary_file_endpoint           = (known after apply)
+      + secondary_file_host               = (known after apply)
+      + secondary_location                = (known after apply)
+      + secondary_queue_endpoint          = (known after apply)
+      + secondary_queue_host              = (known after apply)
+      + secondary_table_endpoint          = (known after apply)
+      + secondary_table_host              = (known after apply)
+      + secondary_web_endpoint            = (known after apply)
+      + secondary_web_host                = (known after apply)
+      ~ tags                              = {
+          + "new-tag" = "false"
+          ~ "owner"   = "example" -> "demo"
+            # (2 unchanged elements hidden)
+        }
+        # (17 unchanged attributes hidden)
+
+      ~ blob_properties {
+          ~ change_feed_enabled           = false -> (known after apply)
+          ~ change_feed_retention_in_days = 0 -> (known after apply)
+          + default_service_version       = (known after apply)
+          ~ last_access_time_enabled      = false -> (known after apply)
+          ~ versioning_enabled            = false -> (known after apply)
+
+          + container_delete_retention_policy {
+              + days = (known after apply)
+            }
+
+          + cors_rule {
+              + allowed_headers    = (known after apply)
+              + allowed_methods    = (known after apply)
+              + allowed_origins    = (known after apply)
+              + exposed_headers    = (known after apply)
+              + max_age_in_seconds = (known after apply)
+            }
+
+          + delete_retention_policy {
+              + days = (known after apply)
+            }
+
+          + restore_policy {
+              + days = (known after apply)
+            }
+        }
+
+      ~ network_rules {
+          ~ bypass                     = [
+              - "AzureServices",
+            ] -> (known after apply)
+          ~ default_action             = "Allow" -> (known after apply)
+          ~ ip_rules                   = [] -> (known after apply)
+          ~ virtual_network_subnet_ids = [] -> (known after apply)
+
+          + private_link_access {
+              + endpoint_resource_id = (known after apply)
+              + endpoint_tenant_id   = (known after apply)
+            }
+        }
+
+      ~ queue_properties {
+          + cors_rule {
+              + allowed_headers    = (known after apply)
+              + allowed_methods    = (known after apply)
+              + allowed_origins    = (known after apply)
+              + exposed_headers    = (known after apply)
+              + max_age_in_seconds = (known after apply)
+            }
+
+          ~ hour_metrics {
+              ~ enabled               = true -> (known after apply)
+              ~ include_apis          = true -> (known after apply)
+              ~ retention_policy_days = 7 -> (known after apply)
+              ~ version               = "1.0" -> (known after apply)
+            }
+
+          ~ logging {
+              ~ delete                = false -> (known after apply)
+              ~ read                  = false -> (known after apply)
+              ~ retention_policy_days = 0 -> (known after apply)
+              ~ version               = "1.0" -> (known after apply)
+              ~ write                 = false -> (known after apply)
+            }
+
+          ~ minute_metrics {
+              ~ enabled               = false -> (known after apply)
+              ~ include_apis          = false -> (known after apply)
+              ~ retention_policy_days = 0 -> (known after apply)
+              ~ version               = "1.0" -> (known after apply)
+            }
+        }
+
+      + routing {
+          + choice                      = (known after apply)
+          + publish_internet_endpoints  = (known after apply)
+          + publish_microsoft_endpoints = (known after apply)
+        }
+
+      ~ share_properties {
+          + cors_rule {
+              + allowed_headers    = (known after apply)
+              + allowed_methods    = (known after apply)
+              + allowed_origins    = (known after apply)
+              + exposed_headers    = (known after apply)
+              + max_age_in_seconds = (known after apply)
+            }
+
+          ~ retention_policy {
+              ~ days = 7 -> (known after apply)
+            }
+
+          + smb {
+              + authentication_types            = (known after apply)
+              + channel_encryption_type         = (known after apply)
+              + kerberos_ticket_encryption_type = (known after apply)
+              + multichannel_enabled            = (known after apply)
+              + versions                        = (known after apply)
+            }
+        }
+    }
+
+  # module.log_analytics.azurerm_storage_management_policy.archive_storage[0] must be replaced
+-/+ resource "azurerm_storage_management_policy" "archive_storage" {
+      ~ id                 = "/subscriptions/1b298c01-0747-469e-8955-af1486a97bc4/resourceGroups/rg-base-example-dev/providers/Microsoft.Storage/storageAccounts/examplelog/managementPolicies/default" -> (known after apply)
+      ~ storage_account_id = "/subscriptions/1b298c01-0747-469e-8955-af1486a97bc4/resourceGroups/rg-base-example-dev/providers/Microsoft.Storage/storageAccounts/examplelog" -> (known after apply) # forces replacement
+
+      ~ rule {
+            name    = "Archive"
+            # (1 unchanged attribute hidden)
+
+          ~ filters {
+              - prefix_match = [] -> null
+                # (1 unchanged attribute hidden)
+            }
+
+            # (1 unchanged block hidden)
+        }
+    }
+
+  # module.resource_group.azurecaf_name.rg must be replaced
+-/+ resource "azurecaf_name" "rg" {
+      ~ id            = "hgovayvauumnhejb" -> (known after apply)
+        name          = "base"
+      ~ result        = "rg-base-example-dev" -> (known after apply)
+      ~ results       = {} -> (known after apply)
+      ~ suffixes      = [ # forces replacement
+          - "example",
+          + "demo",
+            "dev",
+        ]
+        # (6 unchanged attributes hidden)
+    }
+
+  # module.resource_group.azurerm_resource_group.main_rg must be replaced
+-/+ resource "azurerm_resource_group" "main_rg" {
+      ~ id       = "/subscriptions/1b298c01-0747-469e-8955-af1486a97bc4/resourceGroups/rg-base-example-dev" -> (known after apply)
+      ~ name     = "rg-base-example-dev" -> (known after apply) # forces replacement
+      ~ tags     = {
+          ~ "owner" = "example" -> "demo"
+            # (2 unchanged elements hidden)
+        }
+        # (1 unchanged attribute hidden)
+    }
+
+Plan: 13 to add, 0 to change, 13 to destroy.
+
+Changes to Outputs:
+  ~ result = (sensitive value)
