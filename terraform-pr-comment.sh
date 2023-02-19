@@ -66,6 +66,16 @@ function _escape_content
     fi
 }
 
+function _render_html_details_summary
+{
+    title="${1}"
+    if [[ -z "${title}" ]]; then
+        title="Details"
+    fi
+    # shellcheck disable=SC2028
+    echo "<summary><strong>${title}</strong></summary>\n\n"
+}
+
 function _render_command_fmt
 {
     if [[ ! -f "${1}" ]]; then
@@ -77,8 +87,8 @@ function _render_command_fmt
     if [[ -n "${raw_log}" ]]; then
         local esc_log
         esc_log=$(_escape_content "${raw_log}")
-        # shellcheck disable=SC2028
-        echo "<details><summary>Details</summary>\n\n\`\`\`diff\n${esc_log}\n\`\`\`\n</details>\n\n"
+        # shellcheck disable=SC2028,SC2119
+        echo "<details>$(_render_html_details_summary)\`\`\`diff\n${esc_log}\n\`\`\`\n</details>\n\n"
     else
         # shellcheck disable=SC2028
         echo "Success! The files are well-formed.\n\n"
@@ -106,7 +116,8 @@ function _render_command_plan
         esc_log+=$(_escape_content "${details}")
         content+="${summary}\n\n"
         if [[ -n "${details}" ]]; then
-            content+="<details><summary>Details</summary>\n\n\`\`\`\n${esc_log}\n\`\`\`\n</details>\n\n"
+            # shellcheck disable=SC2119
+            content+="<details>$(_render_html_details_summary)\`\`\`\n${esc_log}\n\`\`\`\n</details>\n\n"
         fi
     fi
     # Next, render `terraform show`
@@ -128,7 +139,8 @@ function _render_command_plan
             if [[ -n "${summary}" ]]; then
                 content+="${summary}\n\n"
             fi
-            content+="<details><summary>Details</summary>\n\n\`\`\`diff\n${esc_log}\n\`\`\`\n</details>\n\n"
+            # shellcheck disable=SC2119
+            content+="<details>$(_render_html_details_summary)\`\`\`diff\n${esc_log}\n\`\`\`\n</details>\n\n"
         fi
     fi
     echo "${content}"
@@ -149,8 +161,8 @@ function _render_command_validate
             # shellcheck disable=SC2028
             echo "${esc_log}\n\n"
         else
-            # shellcheck disable=SC2028
-            echo "<details><summary>Details</summary>\n\n\`\`\`\n${esc_log}\n\`\`\`\n</details>\n\n"
+            # shellcheck disable=SC2028,SC2119
+            echo "<details>$(_render_html_details_summary)\`\`\`\n${esc_log}\n\`\`\`\n</details>\n\n"
         fi
     fi
 }
@@ -169,7 +181,7 @@ else
 fi
 
 # Open outer <details>
-comment+="<details><summary>Build Details</summary>\n\n"
+comment+="<details>$(_render_html_details_summary "Build Details")"
 
 # shellcheck disable=SC2045
 for log_file in $(ls --sort=version "${arg_logs_path}"/*."${arg_command}".{log,txt} 2>/dev/null); do
