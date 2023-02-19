@@ -104,25 +104,25 @@ function _render_plan
         fi
     fi
     # Next, render `terraform show`
-    # if [[ -f "${show_plan}" ]]; then
-    #     local raw_log
-    #     raw_log=$(< "${1}")
-    #     # shellcheck disable=SC2001
-    #     raw_log=$(echo "${raw_log}" | sed 's/\x1b\[[0-9;]*m//g')
-    #     # Trim leading and trailing empty lines
-    #     raw_log=$(echo "${raw_log}" | sed -e '/./,$!d' -e :a -e '/^\n*$/{$d;N;ba' -e '}')
-    #     if [[ -n "${raw_log}" ]]; then
-    #         # Plan clean up rules stolen from https://github.com/gunkow/terraform-pr-commenter
-    #         raw_log=$(echo "${raw_log}" | sed -r '/^(An execution plan has been generated and is shown below.|Terraform used the selected providers to generate the following execution|plan. Resource actions are indicated with the following symbols:|No changes. Infrastructure is up-to-date.|No changes. Your infrastructure matches the configuration.|Note: Objects have changed outside of Terraform)$/d') # Strip refresh section
-    #         raw_log=$(echo "${raw_log}" | sed -r '/Plan: /q') # Ignore everything after plan summary
-    #         raw_log=${raw_log::65300} # GitHub has a 65535-char comment limit - truncate plan, leaving space for comment wrapper
-    #         raw_log=$(echo "${raw_log}" | sed -r 's/^([[:blank:]]*)([-+~])/\2\1/g') # Move any diff characters to start of line
-    #         summary=$(echo "${raw_log}" | tail -n 1) # Plan: is the last line now
-    #         details=$(_escape_content "${raw_log}")
-    #         content+="${summary}\n\n"
-    #         content+="<details><summary>Details</summary>\n\n\`\`\`diff\n${details}\n\`\`\`\n</details>\n\n"
-    #     fi
-    # fi
+    if [[ -f "${show_plan}" ]]; then
+        local raw_log
+        raw_log=$(< "${1}")
+        # shellcheck disable=SC2001
+        raw_log=$(echo "${raw_log}" | sed 's/\x1b\[[0-9;]*m//g')
+        # Trim leading and trailing empty lines
+        raw_log=$(echo "${raw_log}" | sed -e '/./,$!d' -e :a -e '/^\n*$/{$d;N;ba' -e '}')
+        if [[ -n "${raw_log}" ]]; then
+            # Plan clean up rules stolen from https://github.com/gunkow/terraform-pr-commenter
+            raw_log=$(echo "${raw_log}" | sed -r '/^(An execution plan has been generated and is shown below.|Terraform used the selected providers to generate the following execution|plan. Resource actions are indicated with the following symbols:|No changes. Infrastructure is up-to-date.|No changes. Your infrastructure matches the configuration.|Note: Objects have changed outside of Terraform)$/d') # Strip refresh section
+            raw_log=$(echo "${raw_log}" | sed -r '/Plan: /q') # Ignore everything after plan summary
+            raw_log=${raw_log::65300} # GitHub has a 65535-char comment limit - truncate plan, leaving space for comment wrapper
+            raw_log=$(echo "${raw_log}" | sed -r 's/^([[:blank:]]*)([-+~])/\2\1/g') # Move any diff characters to start of line
+            summary=$(echo "${raw_log}" | tail -n 1) # Plan: is the last line now
+            esc_log=$(_escape_content "${raw_log}")
+            content+="XXX ${summary}\n\n"
+            content+="<details><summary>Details</summary>\n\n\`\`\`diff\n${esc_log}\n\`\`\`\n</details>\n\n"
+        fi
+    fi
     echo "${content}"
 }
 
