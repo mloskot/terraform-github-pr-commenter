@@ -57,14 +57,26 @@ fi
 
 function _escape_content
 {
-    if command -v "iconv" &> /dev/null; then
-        echo "${1}" | iconv -c -f utf-8 -t ascii//TRANSLIT | sed s/^\?//g | sed -E ':a;N;$!ba;s/\r{0,1}\n/\\n/g'
-    elif command -v "konwert" &> /dev/null; then
-        echo "${1}" | konwert utf8-ascii | sed s/^\?//g | sed -E ':a;N;$!ba;s/\r{0,1}\n/\\n/g'
+    if [[ -n "${1}" ]]; then
+        if command -v "iconv" &> /dev/null; then
+            echo "${1}" | iconv -c -f utf-8 -t ascii//TRANSLIT | sed s/^\?//g | sed -E ':a;N;$!ba;s/\r{0,1}\n/\\n/g'
+        elif command -v "konwert" &> /dev/null; then
+            echo "${1}" | konwert utf8-ascii | sed s/^\?//g | sed -E ':a;N;$!ba;s/\r{0,1}\n/\\n/g'
+        fi
     fi
 }
 
-function _render_fmt
+function _render_html_details_summary
+{
+    title="${1}"
+    if [[ -z "${title}" ]]; then
+        title="Details"
+    fi
+    # shellcheck disable=SC2028
+    echo "<summary><strong>${title}</strong></summary>\n\n"
+}
+
+function _render_command_fmt
 {
     if [[ ! -f "${1}" ]]; then
         return 1
@@ -75,15 +87,15 @@ function _render_fmt
     if [[ -n "${raw_log}" ]]; then
         local esc_log
         esc_log=$(_escape_content "${raw_log}")
-        # shellcheck disable=SC2028
-        echo "<details><summary>Details</summary>\n\n\`\`\`diff\n${esc_log}\n\`\`\`\n</details>\n\n"
+        # shellcheck disable=SC2028,SC2119
+        echo "<details>$(_render_html_details_summary)\`\`\`diff\n${esc_log}\n\`\`\`\n</details>\n\n"
     else
         # shellcheck disable=SC2028
         echo "Success! The files are well-formed.\n\n"
     fi
 }
 
-function _render_plan
+function _render_command_plan
 {
     local show_plan show_plan_json
     show_plan="${1}"
@@ -104,7 +116,8 @@ function _render_plan
         esc_log+=$(_escape_content "${details}")
         content+="${summary}\n\n"
         if [[ -n "${details}" ]]; then
-            content+="<details><summary>Details</summary>\n\n\`\`\`\n${esc_log}\n\`\`\`\n</details>\n\n"
+            # shellcheck disable=SC2119
+            content+="<details>$(_render_html_details_summary)\`\`\`\n${esc_log}\n\`\`\`\n</details>\n\n"
         fi
     fi
     # Next, render `terraform show`
@@ -126,13 +139,14 @@ function _render_plan
             if [[ -n "${summary}" ]]; then
                 content+="${summary}\n\n"
             fi
-            content+="<details><summary>Details</summary>\n\n\`\`\`diff\n${esc_log}\n\`\`\`\n</details>\n\n"
+            # shellcheck disable=SC2119
+            content+="<details>$(_render_html_details_summary)\`\`\`diff\n${esc_log}\n\`\`\`\n</details>\n\n"
         fi
     fi
     echo "${content}"
 }
 
-function _render_validate
+function _render_command_validate
 {
     if [[ ! -f "${1}" ]]; then
         return 1
@@ -147,8 +161,8 @@ function _render_validate
             # shellcheck disable=SC2028
             echo "${esc_log}\n\n"
         else
-            # shellcheck disable=SC2028
-            echo "<details><summary>Details</summary>\n\n\`\`\`\n${esc_log}\n\`\`\`\n</details>\n\n"
+            # shellcheck disable=SC2028,SC2119
+            echo "<details>$(_render_html_details_summary)\`\`\`\n${esc_log}\n\`\`\`\n</details>\n\n"
         fi
     fi
 }
@@ -165,15 +179,19 @@ if [[ -n "${arg_build_url}" ]]; then
 else
     comment="## Build \`${arg_build_number}\`: Terraform \`${arg_command}\`\n\n"
 fi
+
+# Open outer <details>
+comment+="<details>$(_render_html_details_summary "Run Details")"
+
 # shellcheck disable=SC2045
 for log_file in $(ls --sort=version "${arg_logs_path}"/*."${arg_command}".{log,txt} 2>/dev/null); do
     echo -e "\033[32;1mINFO:\033[0m Rendering ${arg_command} output from ${log_file}"
     # Render section title
     section=$(basename "${log_file}")
     section=$(echo "${section}" | cut -d '_' -f 2 | cut -d . -f 1)
-    comment+="### Layer: \`${section}\`\n\n"
+    comment+="### Component: \`${section}\`\n\n"
     # Render section content
-    content=$(_render_"${arg_command}"  "${log_file}")
+    content=$(_render_command_"${arg_command}"  "${log_file}")
     if [[ -z "${content}" ]]; then
         set -e
         echo -e "\033[31;1mERROR:\033[0m Rendering ${arg_command} output failed"
@@ -183,7 +201,9 @@ for log_file in $(ls --sort=version "${arg_logs_path}"/*."${arg_command}".{log,t
 
     ((logs_collected++))
 done
-comment+="\n\n"
+
+# Close outer <details>
+comment+="</details>\n"
 
 unset arg_command
 unset arg_logs_path
