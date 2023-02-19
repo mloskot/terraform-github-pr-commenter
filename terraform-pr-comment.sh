@@ -70,7 +70,7 @@ function _render_html_details_summary
 {
     title="${1}"
     if [[ -z "${title}" ]]; then
-        title="Details"
+        title="Component Details"
     fi
     # shellcheck disable=SC2028
     echo "<summary><strong>${title}</strong></summary>\n\n"
@@ -181,7 +181,7 @@ else
 fi
 
 # Open outer <details>
-comment+="<details>$(_render_html_details_summary "Build Details")"
+comment+="<details>$(_render_html_details_summary "Run Details")"
 
 # shellcheck disable=SC2045
 for log_file in $(ls --sort=version "${arg_logs_path}"/*."${arg_command}".{log,txt} 2>/dev/null); do
@@ -189,7 +189,7 @@ for log_file in $(ls --sort=version "${arg_logs_path}"/*."${arg_command}".{log,t
     # Render section title
     section=$(basename "${log_file}")
     section=$(echo "${section}" | cut -d '_' -f 2 | cut -d . -f 1)
-    comment+="### Layer: \`${section}\`\n\n"
+    comment+="### Component: \`${section}\`\n\n"
     # Render section content
     content=$(_render_command_"${arg_command}"  "${log_file}")
     if [[ -z "${content}" ]]; then
