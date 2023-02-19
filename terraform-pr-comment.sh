@@ -95,9 +95,9 @@ function _render_plan
         changes=$(cat "${show_plan_json}" | jq -r '[.resource_changes[]? | { resource: .address, action: .change.actions[] } | select (.action != "no-op")]')
         summary=$(echo "${changes}" | jq -r '.   | "Plan will apply \(length) changes"')
         details=$(echo "${changes}" | jq -r '.[] | "* \(.resource) will be \(.action)d"')
-        esc_log+=$(_escape_content "${details}")
-        content+="Summary: ${summary}\n\n"
-        content+="<details><summary>Details</summary>\n\n\`\`\`\n${esc_log}\n\`\`\`\n</details>\n\n"
+        details+=$(_escape_content "${details}")
+        content+="${summary}\n\n"
+        content+="<details><summary>Details</summary>\n\n\`\`\`\n${details}\n\`\`\`\n</details>\n\n"
     fi
     # Next, render `terraform show`
     local raw_log
@@ -113,9 +113,10 @@ function _render_plan
             raw_log=$(echo "${raw_log}" | sed -r '/Plan: /q') # Ignore everything after plan summary
             raw_log=${raw_log::65300} # GitHub has a 65535-char comment limit - truncate plan, leaving space for comment wrapper
             raw_log=$(echo "${raw_log}" | sed -r 's/^([[:blank:]]*)([-+~])/\2\1/g') # Move any diff characters to start of line
-            esc_log=$(_escape_content "${raw_log}")
-            # shellcheck disable=SC2028
-            content+="<details><summary>Details</summary>\n\n\`\`\`diff\n${esc_log}\n\`\`\`\n</details>\n\n"
+            summary=$(echo "${raw_log}" | tail -n 1) # Plan: is the last line now
+            details=$(_escape_content "${raw_log}")
+            content+="${summary}\n\n"
+            content+="<details><summary>Details</summary>\n\n\`\`\`diff\n${details}\n\`\`\`\n</details>\n\n"
         fi
     fi
     echo "${content}"
