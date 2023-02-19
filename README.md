@@ -11,6 +11,8 @@ task or, in future, by GitHub Actions using GitHub Script method
 
 - Bash
 - `iconv` or `konwert` to convert the Terraform fancy outputs to plain and easily escapable ASCII.
+    The conversion especially helps to avoid Azure Pipelines [task.setvariable](https://learn.microsoft.com/en-us/azure/devops/pipelines/process/set-variables-scripts)
+    tripping over fancy Unicode characters (e.g. box drawing).
 - Terraform command output saved in `<00N>_<title>.<command>.{log,txt}` files (see [description](#description) below).
 
 ## Usage: CLI (testing)
