@@ -57,10 +57,12 @@ fi
 
 function _escape_content
 {
-    if command -v "iconv" &> /dev/null; then
-        echo "${1}" | iconv -c -f utf-8 -t ascii//TRANSLIT | sed s/^\?//g | sed -E ':a;N;$!ba;s/\r{0,1}\n/\\n/g'
-    elif command -v "konwert" &> /dev/null; then
-        echo "${1}" | konwert utf8-ascii | sed s/^\?//g | sed -E ':a;N;$!ba;s/\r{0,1}\n/\\n/g'
+    if [[ -n "${1}" ]]; then
+        if command -v "iconv" &> /dev/null; then
+            echo "${1}" | iconv -c -f utf-8 -t ascii//TRANSLIT | sed s/^\?//g | sed -E ':a;N;$!ba;s/\r{0,1}\n/\\n/g'
+        elif command -v "konwert" &> /dev/null; then
+            echo "${1}" | konwert utf8-ascii | sed s/^\?//g | sed -E ':a;N;$!ba;s/\r{0,1}\n/\\n/g'
+        fi
     fi
 }
 
