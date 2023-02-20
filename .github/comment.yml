@@ -1,0 +1,18 @@
+---
+on:
+  pull_request:
+    branches:
+      - main
+
+env:
+  TerraformBuildUrl: ''
+
+jobs:
+  post-comment:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: 'Render PR Comment - Terraform validate'
+        shell: bash
+        run: |
+          source "${{ github.workspace }}/terraform-pr-comment.sh" validate "${{ github.workspace }}/test" "${{ github.run_number }}"
