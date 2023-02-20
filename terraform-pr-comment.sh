@@ -14,6 +14,7 @@ VERSION="0.2.0"
 # <title> part is used as heading of section for given log
 # <command> used in the comment title together with given build number
 #
+set -x
 if [[ $# -lt 3 ]]; then
     echo "terraform-githbu-pr-commenter v${VERSION}"
     echo

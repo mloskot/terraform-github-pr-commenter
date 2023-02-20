@@ -17,4 +17,5 @@ jobs:
       - name: 'Render PR Comment - Terraform validate'
         shell: bash
         run: |
+          bash --version
           source "${{ github.workspace }}/terraform-pr-comment.sh" validate "${{ github.workspace }}/test" "${{ github.run_number }}"
