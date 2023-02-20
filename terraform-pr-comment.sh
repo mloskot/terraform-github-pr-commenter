@@ -14,7 +14,6 @@ VERSION="0.2.0"
 # <title> part is used as heading of section for given log
 # <command> used in the comment title together with given build number
 #
-set -x
 if [[ $# -lt 3 ]]; then
     echo "terraform-githbu-pr-commenter v${VERSION}"
     echo
@@ -186,7 +185,6 @@ comment+="<details>$(_render_html_details_summary "Run Details")"
 
 # shellcheck disable=SC2045
 for log_file in $(ls --sort=version "${arg_logs_path}"/*."${arg_command}".{log,txt} 2>/dev/null); do
-    echo XXXX
     echo -e "\033[32;1mINFO:\033[0m Rendering ${arg_command} output from ${log_file}"
     # Render section title
     section=$(basename "${log_file}")
@@ -200,10 +198,8 @@ for log_file in $(ls --sort=version "${arg_logs_path}"/*."${arg_command}".{log,t
         exit 1
     fi
     comment+="${content}"
-    echo QQQQQQQQQQQ
 
-    ((logs_collected++))
-    echo EEEEEEEEEEEEEE
+    ((++logs_collected))
 done
 
 # Close outer <details>
