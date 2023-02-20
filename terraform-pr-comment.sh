@@ -191,13 +191,17 @@ for log_file in $(ls --sort=version "${arg_logs_path}"/*."${arg_command}".{log,t
     section=$(echo "${section}" | cut -d '_' -f 2 | cut -d . -f 1)
     comment+="### Component: \`${section}\`\n\n"
     # Render section content
+    echo XXXX
     content=$(_render_command_"${arg_command}"  "${log_file}")
+    echo ZZZZ
     if [[ -z "${content}" ]]; then
         set -e
         echo -e "\033[31;1mERROR:\033[0m Rendering ${arg_command} output failed"
+        echo WWWW
         exit 1
     fi
     comment+="${content}"
+    echo QQQQQQQQQQQ
 
     ((logs_collected++))
 done
