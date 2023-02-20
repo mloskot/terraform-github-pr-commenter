@@ -7,7 +7,7 @@ on:
       - main
 
 env:
-  TerraformBuildUrl: ''
+  TerraformBuildUrl: "${{ github.server.url }}/${{ github.repository }}/actions/runs/${{ github.run.id }}"
 
 jobs:
   post-comment:
@@ -18,4 +18,16 @@ jobs:
         shell: bash
         run: |
           bash --version
-          source "${{ github.workspace }}/terraform-pr-comment.sh" validate "${{ github.workspace }}/test" "${{ github.run_number }}"
+          source "${{ github.workspace }}/terraform-pr-comment.sh" fmt "${{ github.workspace }}/test" "${{ github.run_number }}" "$TerraformBuildUrl"
+
+      - name: 'Render PR Comment - Terraform fmt'
+        shell: bash
+        run: |
+          bash --version
+          source "${{ github.workspace }}/terraform-pr-comment.sh" validate "${{ github.workspace }}/test" "${{ github.run_number }}" "$TerraformBuildUrl"
+
+      - name: 'Render PR Comment - Terraform plan'
+        shell: bash
+        run: |
+          bash --version
+          source "${{ github.workspace }}/terraform-pr-comment.sh" plan "${{ github.workspace }}/test" "${{ github.run_number }}" "$TerraformBuildUrl"
