@@ -185,25 +185,24 @@ comment+="<details>$(_render_html_details_summary "Run Details")"
 
 # shellcheck disable=SC2045
 for log_file in $(ls --sort=version "${arg_logs_path}"/*."${arg_command}".{log,txt} 2>/dev/null); do
+    echo XXXX
     echo -e "\033[32;1mINFO:\033[0m Rendering ${arg_command} output from ${log_file}"
     # Render section title
     section=$(basename "${log_file}")
     section=$(echo "${section}" | cut -d '_' -f 2 | cut -d . -f 1)
     comment+="### Component: \`${section}\`\n\n"
     # Render section content
-    echo XXXX
     content=$(_render_command_"${arg_command}"  "${log_file}")
-    echo ZZZZ
     if [[ -z "${content}" ]]; then
         set -e
         echo -e "\033[31;1mERROR:\033[0m Rendering ${arg_command} output failed"
-        echo WWWW
         exit 1
     fi
     comment+="${content}"
     echo QQQQQQQQQQQ
 
     ((logs_collected++))
+    echo EEEEEEEEEEEEEE
 done
 
 # Close outer <details>

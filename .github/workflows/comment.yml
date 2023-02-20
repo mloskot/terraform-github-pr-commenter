@@ -1,4 +1,6 @@
 ---
+name: terraform-github-pr-commenter
+
 on:
   pull_request:
     branches:
