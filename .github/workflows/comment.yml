@@ -19,7 +19,7 @@ jobs:
         run: |
           bash --version
           source "${{ github.workspace }}/terraform-pr-comment.sh" fmt "${{ github.workspace }}/test" "${{ github.run_number }}" "$TerraformBuildUrl"
-          echo 'TERRAFORM_COMMAND_PR_COMMENT="Test comment content"' >> $GITHUB_ENV
+          echo "TERRAFORM_COMMAND_PR_COMMENT=${TERRAFORM_COMMAND_PR_COMMENT}" >> $GITHUB_ENV
       - name: 'Comment PR - Terraform validate'
         uses: actions/github-script@v6
         with:
