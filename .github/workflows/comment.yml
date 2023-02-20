@@ -7,7 +7,7 @@ on:
       - main
 
 env:
-  TerraformBuildUrl: "${{ github.server.url }}/${{ github.repository }}/actions/runs/${{ github.run.id }}"
+  TerraformBuildUrl: "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
 
 jobs:
   post-comment:
