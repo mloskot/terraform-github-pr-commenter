@@ -1,5 +1,5 @@
 #!/bin/bash
-VERSION="0.2.0"
+VERSION="0.3.0"
 # Collect output of given Terraform command from log files in given location
 # and render it in Markdown for PR comment,
 # then return it via exported environment variable.
