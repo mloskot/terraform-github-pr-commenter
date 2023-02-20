@@ -10,3 +10,9 @@ A complete test based on the [Terraform Get Started - Docker](https://developer.
    in order to obtain logs with different output.
    Then, repeat steps 2-4.
 
+## 1. Build Infrastructure
+
+```
+terraform init
+terraform apply
+```
