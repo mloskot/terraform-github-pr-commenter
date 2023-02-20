@@ -28,7 +28,7 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: "${{ env.TERRAFORM_COMMAND_PR_COMMENT }}"
+              body: process.env.TERRAFORM_COMMAND_PR_COMMENT
             });
 
       - name: 'Render PR Comment - Terraform fmt'
