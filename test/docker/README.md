@@ -16,3 +16,15 @@ A complete test based on the [Terraform Get Started - Docker](https://developer.
 terraform init
 terraform apply
 ```
+
+## 2. Generate log files
+
+Obtain initial batch of logs using the `<ordinal>_<component>.<command>.{log,json}`
+naming (see [README.md](../../README.md).
+
+```
+terraform validate -no-color > 001-docker.validate.log
+terraform fmt -no-color -check -diff > 001-docker.fmt.log
+terraform plan -no-color -out=./001-docker.plan.log
+terraform show -no-color -json > 001_docker.plan.json
+```
