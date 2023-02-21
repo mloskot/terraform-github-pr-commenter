@@ -17,11 +17,11 @@ VERSION="0.3.0"
 usage()
 {
     echo "Usage: $0 [arguments]"
+    echo "  -v,--verbose                Advertise detailed steps and actions (pass first for arguments logging)"
     echo "  -c,--command <name>         Terraform command: fmt, plan, validate"
     echo "  -l,--logs-path <path>       Location where to look for log files with Terraform command output"
     echo "  -b,--build-number <number>  Build number or identifier provided by CI/CD service"
     echo "  -u,--build-url <url>        Build results URL provided by CI/CD service"
-    echo "  -v,--verbose                Advertise detailed steps and actions"
     echo "  -h,--help                   Displays this message"
     exit 1
 }
@@ -50,14 +50,16 @@ arg_logs_path=""
 arg_build_number=""
 arg_build_url=""
 arg_verbose=0
+arg_disable_outer_details=0
 while [[ $# -gt 0 ]];
 do
     case $1 in
-        -v|--verbose) arg_verbose=1;;
+        -v|--verbose) arg_verbose=1; echolog "Enabling verbose logging";;
         -c|--command)  test ! -z "$2" && arg_tf_command=$2; echolog "Setting command: ${arg_tf_command}"; shift;;
         -l|--logs-path) test ! -z "$2" && arg_logs_path=$2; echolog "Setting logs path: ${arg_logs_path}"; shift;;
         -b|--build-number) test ! -z "$2" && arg_build_number=$2; echolog "Setting build number: ${arg_build_number}"; shift;;
         -u|--build-url) test ! -z "$2" && arg_build_url=$2; echolog "Setting build url: ${arg_build_url}"; shift;;
+        -d|--disable-outer-details) arg_disable_outer_details=1; echolog "Disabling outer details";;
         -h|--help) usage;;
         *) echolog "Unknown argument: $1"; usage;;
     esac;
@@ -210,8 +212,10 @@ else
     comment="## Build \`${arg_build_number}\`: Terraform \`${arg_tf_command}\`\n\n"
 fi
 
-# Open outer <details>
-comment+="<details>$(_render_html_details_summary "Run Details")"
+# Open outer <details>, optional
+if [[ $arg_disable_outer_details -ne 1 ]]; then
+    comment+="<details>$(_render_html_details_summary "Run Details")"
+fi
 
 # shellcheck disable=SC2045
 for log_file in $(ls --sort=version "${arg_logs_path}"/*."${arg_tf_command}".{log,txt} 2>/dev/null); do
@@ -230,8 +234,10 @@ for log_file in $(ls --sort=version "${arg_logs_path}"/*."${arg_tf_command}".{lo
     ((logs_collected++))
 done
 
-# Close outer <details>
-comment+="</details>\n"
+# Close outer <details>, optional
+if [[ $arg_disable_outer_details -ne 1 ]]; then
+    comment+="</details>\n"
+fi
 
 echolog "Exporting TERRAFORM_COMMAND_PR_COMMENT environment variable"
 if [[ $logs_collected -gt 0 ]]; then
