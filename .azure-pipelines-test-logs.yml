@@ -16,11 +16,20 @@ pool:
 
 variables:
   TerraformBuildUrl: '$(System.CollectionUri)$(System.TeamProject)/_build/results?buildId=$(Build.BuildId)'
+  TerraformLogsPath: '$(System.DefaultWorkingDirectory)/test/logs'
 
 steps:
+    - bash: |
+        '$(System.DefaultWorkingDirectory)/terraform-pr-comment.sh' --help || exit 0
+      displayName: 'Script Usage'
     # Terraform validate
     - bash: |
-        source '$(System.DefaultWorkingDirectory)/terraform-pr-comment.sh' validate '$(System.DefaultWorkingDirectory)/test/logs' '$(Build.BuildNumber)' '$(TerraformBuildUrl)'
+        source '$(System.DefaultWorkingDirectory)/terraform-pr-comment.sh' \
+          --verbose \
+          --command validate \
+          --logs-path '$(TerraformLogsPath)' \
+          --build-number '$(Build.BuildNumber)' \
+          --build-url '$(TerraformBuildUrl)'
         echo "##vso[task.setvariable variable=TERRAFORM_VALIDATE_PR_COMMENT]$TERRAFORM_COMMAND_PR_COMMENT"
       displayName: 'Render PR Comment - Terraform validate'
     - task: GitHubComment@0
@@ -33,7 +42,12 @@ steps:
 
     # Terraform fmt
     - bash: |
-        source '$(System.DefaultWorkingDirectory)/terraform-pr-comment.sh' fmt '$(System.DefaultWorkingDirectory)/test/logs' '$(Build.BuildNumber)' '$(TerraformBuildUrl)'
+        source '$(System.DefaultWorkingDirectory)/terraform-pr-comment.sh' \
+          --verbose \
+          --command fmt \
+          --logs-path '$(TerraformLogsPath)' \
+          --build-number '$(Build.BuildNumber)' \
+          --build-url '$(TerraformBuildUrl)'
         echo "##vso[task.setvariable variable=TERRAFORM_FMT_PR_COMMENT]$TERRAFORM_COMMAND_PR_COMMENT"
       displayName: 'Render PR Comment - Terraform fmt'
     - task: GitHubComment@0
@@ -46,7 +60,12 @@ steps:
 
     # Terraform plan
     - bash: |
-        source '$(System.DefaultWorkingDirectory)/terraform-pr-comment.sh' plan '$(System.DefaultWorkingDirectory)/test/logs' '$(Build.BuildNumber)' '$(TerraformBuildUrl)'
+        source '$(System.DefaultWorkingDirectory)/terraform-pr-comment.sh' \
+          --verbose \
+          --command plan \
+          --logs-path '$(TerraformLogsPath)' \
+          --build-number '$(Build.BuildNumber)' \
+          --build-url '$(TerraformBuildUrl)'
         echo "##vso[task.setvariable variable=TERRAFORM_PLAN_PR_COMMENT]$TERRAFORM_COMMAND_PR_COMMENT"
       displayName: 'Render PR Comment - Terraform plan'
     - task: GitHubComment@0
