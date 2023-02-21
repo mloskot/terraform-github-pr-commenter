@@ -14,47 +14,84 @@ VERSION="0.3.0"
 # <title> part is used as heading of section for given log
 # <command> used in the comment title together with given build number
 #
-if [[ $# -lt 3 ]]; then
-    echo "terraform-githbu-pr-commenter v${VERSION}"
-    echo
-    echo "Usage: $0 <terraform command> <path to terraform command output files> <build number> [build url]"
-    echo
-    echo "  <terraform command> is fmt, plan or validate"
-    echo "  <build number> is anything Azure Pipelines or GitHub Actions can provide"
-    echo "  [build url] optional, URL to results of current build to be added to comment"
-    echo
+usage()
+{
+    echo "Usage: $0 [arguments]"
+    echo "  -c,--command <name>         Terraform command: fmt, plan, validate"
+    echo "  -l,--logs-path <path>       Location where to look for log files with Terraform command output"
+    echo "  -b,--build-number <number>  Build number or identifier provided by CI/CD service"
+    echo "  -u,--build-url <url>        Build results URL provided by CI/CD service"
+    echo "  -v,--verbose                Advertise detailed steps and actions"
+    echo "  -h,--help                   Displays this message"
+    exit 1
+}
+function die
+{
+    set -e
+    /bin/false
+}
+function echolog
+{
+    if [ $arg_verbose -ne 0 ]; then
+        echo -n "[$(printf '%(%F %T)T')] "
+        echo -e "\033[32;1mINFO:\033[0m $*" >&2
+    fi
+}
+function echoerr
+{
+    echo -n "[$(printf '%(%F %T)T')] "
+    echo -e "\033[31;1mERROR:\033[0m $*" >&2
+    die
+}
+
+### Arguments ##################################################################
+arg_tf_command=""
+arg_logs_path=""
+arg_build_number=""
+arg_build_url=""
+arg_verbose=0
+while [[ $# -gt 0 ]];
+do
+    case $1 in
+        -v|--verbose) arg_verbose=1;;
+        -c|--command)  test ! -z "$2" && arg_tf_command=$2; echolog "Setting command: ${arg_tf_command}"; shift;;
+        -l|--logs-path) test ! -z "$2" && arg_logs_path=$2; echolog "Setting logs path: ${arg_logs_path}"; shift;;
+        -b|--build-number) test ! -z "$2" && arg_build_number=$2; echolog "Setting build number: ${arg_build_number}"; shift;;
+        -u|--build-url) test ! -z "$2" && arg_build_url=$2; echolog "Setting build url: ${arg_build_url}"; shift;;
+        -h|--help) usage;;
+        *) echolog "Unknown argument: $1"; usage;;
+    esac;
+    shift
+done
+
+if [[ -z "$arg_tf_command" ]]; then
+    echolog "Missing terraform command"
+fi
+if [[ ! "$arg_tf_command" =~ ^(fmt|plan|validate)$ ]]; then
+    echolog -e "Unsupported command ${arg_tf_command}. Valid commands: fmt, plan, validate."
+fi
+if [[ ! -d "$arg_logs_path" ]]; then
+    echo -e "Missing path to terraform command output files"
     exit 1
 fi
-if [[ -z "$1" ]]; then
-    echo -e "\033[31;1mERROR:\033[0m Missing terraform command"
+if [[ -z "$arg_build_number" ]]; then
+    echo -e "Missing build number"
     exit 1
 fi
-if [[ ! "$1" =~ ^(fmt|plan|validate)$ ]]; then
-    echo -e "\033[31;1mERROR:\033[0m Unsupported command ${1}. Valid commands are fmt, plan, validate."
-    exit 1
-fi
-if [[ ! -d "$2" ]]; then
-    echo -e "\033[31;1mERROR:\033[0m Missing path to terraform command output files"
-    exit 1
-fi
-if [[ -z "$3" ]]; then
-    echo -e "\033[31;1mERROR:\033[0m Missing build number"
-    exit 1
-fi
-if [[ -n "$4" ]]; then
-    echo -e "\033[32;1mINFO:\033[0m Using passed build URL $4"
+if [[ -n "$arg_build_url" ]]; then
+    echo -e "Using passed build URL $arg_build_url"
 fi
 
 # TODO: Add more conversion methods
 if command -v "iconv" &> /dev/null; then
-    echo -e "\033[32;1mINFO:\033[0m Using iconv to escape comment content"
+    echolog "Using iconv to escape comment content"
 elif command -v "konwert" &> /dev/null; then
-    echo -e "\033[32;1mINFO:\033[0m Using konwert to escape comment content"
+    echolog "Using konwert to escape comment content"
 else
-    echo -e "\033[31;1mERROR:\033[0m Missing reliable Unicode to ASCII converter for the fancy Terraform output"
-    exit 1
+    echoerr "Missing reliable Unicode to ASCII converter for the fancy Terraform output"
 fi
 
+### Comment Rendering ##########################################################
 function _escape_content
 {
     if [[ -n "${1}" ]]; then
@@ -65,7 +102,6 @@ function _escape_content
         fi
     fi
 }
-
 function _render_html_details_summary
 {
     title="${1}"
@@ -75,7 +111,6 @@ function _render_html_details_summary
     # shellcheck disable=SC2028
     echo "<summary><strong>${title}</strong></summary>\n\n"
 }
-
 function _render_command_fmt
 {
     if [[ ! -f "${1}" ]]; then
@@ -94,7 +129,6 @@ function _render_command_fmt
         echo "Success! The files are well-formed.\n\n"
     fi
 }
-
 function _render_command_plan
 {
     local show_plan show_plan_json
@@ -145,7 +179,6 @@ function _render_command_plan
     fi
     echo "${content}"
 }
-
 function _render_command_validate
 {
     if [[ ! -f "${1}" ]]; then
@@ -167,35 +200,30 @@ function _render_command_validate
     fi
 }
 
-arg_command="${1}"
-arg_logs_path="${2}"
-arg_build_number="${3}"
-arg_build_url="${4}"
+### Main Script ################################################################
 logs_collected=0
 
-echo -e "\033[32;1mINFO:\033[0m Rendering Terraform ${arg_command} comment from ${arg_logs_path}"
+echolog "Rendering Terraform ${arg_tf_command} comment from ${arg_logs_path}"
 if [[ -n "${arg_build_url}" ]]; then
-    comment="## Build [${arg_build_number}](${arg_build_url}): Terraform \`${arg_command}\`\n\n"
+    comment="## Build [${arg_build_number}](${arg_build_url}): Terraform \`${arg_tf_command}\`\n\n"
 else
-    comment="## Build \`${arg_build_number}\`: Terraform \`${arg_command}\`\n\n"
+    comment="## Build \`${arg_build_number}\`: Terraform \`${arg_tf_command}\`\n\n"
 fi
 
 # Open outer <details>
 comment+="<details>$(_render_html_details_summary "Run Details")"
 
 # shellcheck disable=SC2045
-for log_file in $(ls --sort=version "${arg_logs_path}"/*."${arg_command}".{log,txt} 2>/dev/null); do
-    echo -e "\033[32;1mINFO:\033[0m Rendering ${arg_command} output from ${log_file}"
+for log_file in $(ls --sort=version "${arg_logs_path}"/*."${arg_tf_command}".{log,txt} 2>/dev/null); do
+    echolog "Rendering ${arg_tf_command} output from ${log_file}"
     # Render section title
     section=$(basename "${log_file}")
     section=$(echo "${section}" | cut -d '_' -f 2 | cut -d . -f 1)
     comment+="### Component: \`${section}\`\n\n"
     # Render section content
-    content=$(_render_command_"${arg_command}"  "${log_file}")
+    content=$(_render_command_"${arg_tf_command}"  "${log_file}")
     if [[ -z "${content}" ]]; then
-        set -e
-        echo -e "\033[31;1mERROR:\033[0m Rendering ${arg_command} output failed"
-        exit 1
+        echoerr "Rendering ${arg_tf_command} output failed"
     fi
     comment+="${content}"
 
@@ -205,11 +233,7 @@ done
 # Close outer <details>
 comment+="</details>\n"
 
-unset arg_command
-unset arg_logs_path
-unset arg_build_number
-
-echo -e "\033[32;1mINFO:\033[0m Exporting TERRAFORM_COMMAND_PR_COMMENT environment variable"
+echolog "Exporting TERRAFORM_COMMAND_PR_COMMENT environment variable"
 if [[ $logs_collected -gt 0 ]]; then
     # GitHub API uses \r\n as line breaks in bodies
     # https://github.com/actions/runner/issues/1462#issuecomment-1030124116
