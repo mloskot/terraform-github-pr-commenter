@@ -5,10 +5,9 @@ A complete test based on the [Terraform Get Started - Docker](https://developer.
 1. Follow [Build Docker infrastructure using Terraform](https://developer.hashicorp.com/terraform/tutorials/docker-get-started/docker-build).
 2. Generate log files with output from Terraform commands.
 3. Trigger rendering and posting GitHub PR comments.
-4. Take screenshots.
-5. Follow [Change the Terraform code and the infrastructure](https://developer.hashicorp.com/terraform/tutorials/docker-get-started/docker-build).
+4. Follow [Change the Terraform code and the infrastructure](https://developer.hashicorp.com/terraform/tutorials/docker-get-started/docker-build).
    in order to obtain logs with different output.
-   Then, repeat steps 2-4.
+   Then, repeat steps 2. and 3.
 
 ## 1. Build Infrastructure
 
@@ -20,11 +19,29 @@ terraform apply
 ## 2. Generate log files
 
 Obtain initial batch of logs using the `<ordinal>_<component>.<command>.{log,json}`
-naming (see [README.md](../../README.md).
+naming (see [README.md](../../README.md):
 
 ```shell
-terraform validate -no-color            > 001-docker.validate.log
-terraform fmt -no-color -check -diff    > 001-docker.fmt.log
-terraform plan -no-color                > 001-docker.plan.log
+terraform validate -no-color            > 001_docker.validate.log
+terraform fmt -no-color -check -diff    > 001_docker.fmt.log
+terraform plan -no-color                > 001_docker.plan.log
 terraform show -no-color -json          > 001_docker.plan.json
+```
+
+## 3. Post GitHub PR comment
+
+Well, submit PR and let your pipelines run generating the log files,
+then run the `terraform-pr-comment.sh` to render the comment content
+and finally post the comment to GitHub using whatever mean you prefer,
+e.g. Azure Pipelines task `GitHubCommenter@0`, GitHub Script or just `curl`.
+
+## 4. Change Infrastructure
+
+Obtain new set of logs:
+
+```shell
+terraform validate -no-color            > 002-docker.validate.log
+terraform fmt -no-color -check -diff    > 002-docker.fmt.log
+terraform plan -no-color                > 002-docker.plan.log
+terraform show -no-color -json          > 002_docker.plan.json
 ```
