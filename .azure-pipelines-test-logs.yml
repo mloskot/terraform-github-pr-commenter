@@ -20,7 +20,7 @@ variables:
 
 steps:
     - bash: |
-        '$(System.DefaultWorkingDirectory)/terraform-pr-comment.sh' --help
+        '$(System.DefaultWorkingDirectory)/terraform-pr-comment.sh' --help || return 0
       displayName: 'Script Usage'
     # Terraform validate
     - bash: |
