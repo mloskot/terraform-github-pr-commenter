@@ -8,6 +8,7 @@ pr:
   paths:
     include:
     - test/logs/
+    - terraform-pr-comment.sh
     exclude:
     - test/docker/
 
