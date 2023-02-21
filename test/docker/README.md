@@ -45,4 +45,19 @@ terraform fmt -no-color -check -diff    > 002_docker-step-4-change.fmt.log
 terraform plan -no-color                > 002_docker-step-4-change.plan.log
 terraform show -no-color -json          > 002_docker-step-4-change.plan.json
 ```
+
+## 5. Remove Infrastructure Resources
+
+Delete resources from `main.tf`
+
+- `resource "docker_image"`
+- `resource "docker_container"`
+
+and obtain logs of the new state:
+
+```shell
+terraform validate -no-color            > 003_docker-step-5-change.validate.log
+terraform fmt -no-color -check -diff    > 003_docker-step-5-change.fmt.log
+terraform plan -no-color                > 003_docker-step-5-change.plan.log
+terraform show -no-color -json          > 003_docker-step-5-change.plan.json
 ```
