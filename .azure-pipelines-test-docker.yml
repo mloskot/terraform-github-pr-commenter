@@ -19,9 +19,9 @@ variables:
   TerraformLogsPath: '$(System.DefaultWorkingDirectory)/test/docker'
 
 steps:
-    - displayName: 'Script Usage'
-      bash: |
+    - bash: |
         '$(System.DefaultWorkingDirectory)/terraform-pr-comment.sh' --help
+      displayName: 'Script Usage'
 
     # Terraform validate (before fmt, otherwise fmt may issue validation errors)
     - bash: |
