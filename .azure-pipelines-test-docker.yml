@@ -20,7 +20,7 @@ variables:
 
 steps:
     - bash: |
-        '$(System.DefaultWorkingDirectory)/terraform-pr-comment.sh' --help || return 0
+        '$(System.DefaultWorkingDirectory)/terraform-pr-comment.sh' --help || exit 0
       displayName: 'Script Usage'
 
     # Terraform validate (before fmt, otherwise fmt may issue validation errors)
