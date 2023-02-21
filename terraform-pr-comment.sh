@@ -22,6 +22,7 @@ usage()
     echo "  -l,--logs-path <path>       Location where to look for log files with Terraform command output"
     echo "  -b,--build-number <number>  Build number or identifier provided by CI/CD service"
     echo "  -u,--build-url <url>        Build results URL provided by CI/CD service"
+    echo "  -d,--disable-outer-details  Disable outer HTML <details> section"
     echo "  -h,--help                   Displays this message"
     exit 1
 }
