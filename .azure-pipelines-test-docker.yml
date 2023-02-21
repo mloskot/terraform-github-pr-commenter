@@ -1,0 +1,24 @@
+# Pipeline for test/docker infrastructure
+# Pipeline renders comment content and, if run for GitHub PR,
+# posts the comment to the GitHub PR that triggered the comment,
+pr:
+  branches:
+    include:
+    - main
+  paths:
+    include:
+    - test/docker/
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  TerraformBuildUrl: '$(System.CollectionUri)$(System.TeamProject)/_build/results?buildId=$(Build.BuildId)'
+
+steps:
+    # Terraform validate
+    - bash: |
+        source '$(System.DefaultWorkingDirectory)/terraform-pr-comment.sh' validate '$(System.DefaultWorkingDirectory)/test/docker' '$(Build.BuildNumber)' '$(TerraformBuildUrl)'
+        echo "##vso[task.setvariable variable=TERRAFORM_VALIDATE_PR_COMMENT]$TERRAFORM_COMMAND_PR_COMMENT"
+      displayName: 'Render PR Comment - Terraform validate'
+
