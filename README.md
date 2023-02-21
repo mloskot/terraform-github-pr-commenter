@@ -16,15 +16,21 @@ See [screenshot/README.md](screenshot/README.md) for more visual samples of post
     tripping over fancy Unicode characters (e.g. box drawing).
 - Terraform command output saved in `<00N>_<title>.<command>.{log,txt}` files (see [description](#description) below).
 
-## Usage: CLI (testing)
+## Usage: CLI
 
 ```shell
-Usage: ./terraform-pr-comment.sh <terraform command> <path to terraform command output files> <build number> [build url]
+Usage: ./terraform-pr-comment.sh [arguments]
+  -v,--verbose                Advertise detailed steps and actions (pass first for arguments logging)
+  -c,--command <name>         Terraform command: fmt, plan, validate
+  -l,--logs-path <path>       Location where to look for log files with Terraform command output
+  -b,--build-number <number>  Build number or identifier provided by CI/CD service
+  -u,--build-url <url>        Build results URL provided by CI/CD service
+  -d,--disable-outer-details  Disable outer HTML <details> section
+  -h,--help                   Displays this message
 ```
 
-```shell
-./terraform-pr-comment.sh validate /home/mloskot/azure-infrastructure 12345
-```
+Running the script from command line is useful for testing only.
+The script on its own does not post any comments to GitHub.
 
 ## Usage: CI/CD
 
