@@ -1,7 +1,13 @@
+# Pipeline for static test/logs
 # Pipeline renders comment content and, if run for GitHub PR,
-# posts the comment to the GitHub PR that triggered the comment.
-trigger:
-- main
+# posts the comment to the GitHub PR that triggered the comment,
+pr:
+  branches:
+    include:
+    - main
+  paths:
+    include:
+    - test/logs/
 
 pool:
   vmImage: ubuntu-latest
