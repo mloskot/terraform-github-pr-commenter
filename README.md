@@ -18,7 +18,7 @@ See [screenshot/README.md](screenshot/README.md) for more visual samples of post
 
 ## Usage: CLI
 
-```shell
+```console
 Usage: ./terraform-pr-comment.sh [arguments]
   -v,--verbose                Advertise detailed steps and actions (pass first for arguments logging)
   -c,--command <name>         Terraform command: fmt, plan, validate
