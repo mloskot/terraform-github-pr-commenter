@@ -111,7 +111,7 @@ function _render_command_plan
         local changes details
         # shellcheck disable=SC2002
         changes=$(cat "${show_plan_json}" | jq -r '[.resource_changes[]? | { resource: .address, action: .change.actions[] } | select (.action != "no-op")]')
-        summary=$(echo "${changes}" | jq -r '.   | "Plan will apply \(length) changes"')
+        summary=$(echo "${changes}" | jq -r '.   | "Plan will apply \(length) changes (based on JSON output)"')
         details=$(echo "${changes}" | jq -r '.[] | "* \(.resource) will be \(.action)d"')
         esc_log+=$(_escape_content "${details}")
         content+="${summary}\n\n"
