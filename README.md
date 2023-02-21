@@ -4,6 +4,10 @@ Bash script to render Terraform command output as GitHub Pull Request comment
 ready to be posted from any CI/CD agent that can be authenticated with GitHub,
 for example, Azure Pipelines or GitHub Actions.
 
+![fmt](screenshot/fmt.png)
+
+See [screenshot/README.md](screenshot/README.md) for more visual samples of posted GitHub comments.
+
 ## Requirements
 
 - Bash
