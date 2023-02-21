@@ -22,10 +22,10 @@ Obtain initial batch of logs using the `<ordinal>_<component>.<command>.{log,jso
 naming (see [README.md](../../README.md):
 
 ```shell
-terraform validate -no-color            > 001_docker-step-1-build.validate.log
-terraform fmt -no-color -check -diff    > 001_docker-step-1-build.fmt.log
-terraform plan -no-color                > 001_docker-step-1-build.plan.log
-terraform show -no-color -json          > 001_docker-step-1-build.plan.json
+terraform validate -no-color            > 001_docker-step-2-build.validate.log
+terraform fmt -no-color -check -diff    > 001_docker-step-2-build.fmt.log
+terraform plan -no-color                > 001_docker-step-2-build.plan.log
+terraform show -no-color -json          > 001_docker-step-2-build.plan.json
 ```
 
 ## 3. Post GitHub PR comment
@@ -40,8 +40,9 @@ e.g. Azure Pipelines task `GitHubCommenter@0`, GitHub Script or just `curl`.
 Obtain new set of logs:
 
 ```shell
-terraform validate -no-color            > 002_docker-step-2-change.validate.log
-terraform fmt -no-color -check -diff    > 002_docker-step-2-change.fmt.log
-terraform plan -no-color                > 002_docker-step-2-change.plan.log
-terraform show -no-color -json          > 002_docker-step-2-change.plan.json
+terraform validate -no-color            > 002_docker-step-4-change.validate.log
+terraform fmt -no-color -check -diff    > 002_docker-step-4-change.fmt.log
+terraform plan -no-color                > 002_docker-step-4-change.plan.log
+terraform show -no-color -json          > 002_docker-step-4-change.plan.json
+```
 ```
