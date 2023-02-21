@@ -1,0 +1,49 @@
+---
+name: terraform-github-pr-commenter
+
+on:
+  pull_request:
+    branches:
+      - main
+
+env:
+  TerraformBuildUrl: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
+jobs:
+  post-comment:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: 'Render PR Comment - Terraform validate'
+        shell: bash
+        run: |
+          bash --version
+          source "${{ github.workspace }}/terraform-pr-comment.sh" fmt "${{ github.workspace }}/test" "${{ github.run_number }}" "$TerraformBuildUrl"
+          echo 'TERRAFORM_COMMAND_PR_COMMENT=<<EOF' >> $GITHUB_ENV
+          echo "${TERRAFORM_COMMAND_PR_COMMENT}" >> $GITHUB_ENV
+          echo 'EOF' >> $GITHUB_ENV
+      - name: 'Comment PR - Terraform validate'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            console.log('XXXXX')
+            console.log(process.env.TERRAFORM_COMMAND_PR_COMMENT)
+            console.log('ZZZZZ')
+            const result = await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: process.env.TERRAFORM_COMMAND_PR_COMMENT
+            });
+
+      - name: 'Render PR Comment - Terraform fmt'
+        shell: bash
+        run: |
+          bash --version
+          source "${{ github.workspace }}/terraform-pr-comment.sh" validate "${{ github.workspace }}/test" "${{ github.run_number }}" "$TerraformBuildUrl"
+
+      - name: 'Render PR Comment - Terraform plan'
+        shell: bash
+        run: |
+          bash --version
+          source "${{ github.workspace }}/terraform-pr-comment.sh" plan "${{ github.workspace }}/test" "${{ github.run_number }}" "$TerraformBuildUrl"
