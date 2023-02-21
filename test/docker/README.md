@@ -29,6 +29,9 @@ terraform plan -no-color                > 001_docker-step-2-build.plan.log
 terraform show -no-color -json          > 001_docker-step-2-build.plan.json
 ```
 
+Note, comment for the `validate` command will be generated with outer `<details>`
+section disabled, so there will be no nested `<details>`, see `.azure-pipelines-test-docker.yml`.
+
 ## 3. Post GitHub PR comment
 
 Well, submit PR and let your pipelines run generating the log files,
