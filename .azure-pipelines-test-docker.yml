@@ -8,6 +8,8 @@ pr:
   paths:
     include:
     - test/docker/
+    exclude:
+    - test/logs/
 
 pool:
   vmImage: ubuntu-latest
