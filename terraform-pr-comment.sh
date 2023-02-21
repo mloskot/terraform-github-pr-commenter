@@ -231,7 +231,7 @@ for log_file in $(ls --sort=version "${arg_logs_path}"/*."${arg_tf_command}".{lo
     fi
     comment+="${content}"
 
-    ((logs_collected++))
+    ((++logs_collected))
 done
 
 # Close outer <details>, optional
