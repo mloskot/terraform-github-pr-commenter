@@ -234,9 +234,9 @@ if [[ $opt_enable_rendering -gt 0 ]]; then
         comment+="\`${arg_build_number}\`"
     fi
     if [[ -n "${arg_build_env}" ]]; then
-        comment+=" Environment: \`${arg_build_env}\`"
+        comment+=" - Environment: \`${arg_build_env}\`"
     fi
-    comment+=" Terraform: \`${arg_tf_command}\`\n\n"
+    comment+=" - Terraform: \`${arg_tf_command}\`\n\n"
 fi
 
 # Render comment body: open outer <details>, optional
