@@ -75,19 +75,16 @@ do
 done
 
 if [[ -z "$arg_tf_command" ]]; then
-    echolog "Missing Terraform command"
+    echoerr "Missing Terraform command"
 fi
 if [[ ! "$arg_tf_command" =~ ^(fmt|plan|validate)$ ]]; then
-    echolog "Unsupported command ${arg_tf_command}. Valid commands: fmt, plan, validate."
+    echoerr "Unsupported command ${arg_tf_command}. Valid commands: fmt, plan, validate."
 fi
 if [[ ! -d "$arg_logs_path" ]] && [[ ! -f "$arg_logs_path" ]]; then
-    echolog "Missing path to Terraform command output files"
+    echoerr "Missing path to Terraform command output files"
 fi
 if [[ -z "$arg_build_number" ]]; then
-    echolog "Missing build number"
-fi
-if [[ -n "$arg_build_url" ]]; then
-    echolog "Using passed build URL $arg_build_url"
+    echoerr "Missing build number"
 fi
 
 ### Check for any options given that disable comment rendering
