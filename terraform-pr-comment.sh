@@ -108,12 +108,17 @@ fi
 ### Comment Rendering ##########################################################
 function _escape_content
 {
+    local escaped
+
     if [[ -n "${1}" ]]; then
         if command -v "iconv" &> /dev/null; then
-            echo "${1}" | iconv -c -f utf-8 -t ascii//TRANSLIT | sed s/^\?//g | sed -E ':a;N;$!ba;s/\r{0,1}\n/\\n/g'
+            escaped=$(echo "${1}" | iconv -c -f utf-8 -t ascii//TRANSLIT)
         elif command -v "konwert" &> /dev/null; then
-            echo "${1}" | konwert utf8-ascii | sed s/^\?//g | sed -E ':a;N;$!ba;s/\r{0,1}\n/\\n/g'
+            escaped=$("${1}" | konwert utf8-ascii)
         fi
+        # shellcheck disable=SC2001
+        echo "${escaped}" | sed s/^\?//g
+        # FIXME: This breaks content of code blocks: | sed -E ':a;N;$!ba;s/\r{0,1}\n/\\n/g'
     fi
 }
 function _render_html_details_summary
