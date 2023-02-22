@@ -14,6 +14,7 @@ VERSION="0.3.0"
 # <title> part is used as heading of section for given log
 # <command> used in the comment title together with given build number
 #
+#set -x
 function usage
 {
     echo "Usage: $0 [arguments]"
@@ -36,13 +37,13 @@ function die
 function echolog
 {
     if [ $arg_verbose -ne 0 ]; then
-        echo -n "[$(printf '%(%F %T)T')] "
+        echo -n "[$(printf '%(%F %T)T')] " >&2
         echo -e "\033[32;1mINFO:\033[0m $*" >&2
     fi
 }
 function echoerr
 {
-    echo -n "[$(printf '%(%F %T)T')] "
+    echo -n "[$(printf '%(%F %T)T')] " >&2
     echo -e "\033[31;1mERROR:\033[0m $*" >&2
     die
 }
@@ -77,18 +78,22 @@ if [[ -z "$arg_tf_command" ]]; then
     echolog "Missing terraform command"
 fi
 if [[ ! "$arg_tf_command" =~ ^(fmt|plan|validate)$ ]]; then
-    echolog -e "Unsupported command ${arg_tf_command}. Valid commands: fmt, plan, validate."
+    echolog "Unsupported command ${arg_tf_command}. Valid commands: fmt, plan, validate."
 fi
 if [[ ! -d "$arg_logs_path" ]]; then
-    echo -e "Missing path to terraform command output files"
-    exit 1
+    echolog "Missing path to terraform command output files"
 fi
 if [[ -z "$arg_build_number" ]]; then
-    echo -e "Missing build number"
-    exit 1
+    echolog "Missing build number"
 fi
 if [[ -n "$arg_build_url" ]]; then
-    echo -e "Using passed build URL $arg_build_url"
+    echolog "Using passed build URL $arg_build_url"
+fi
+
+# Check for any options given that disable comment rendering
+opt_enable_rendering=1
+if [[ $arg_dry_run_list_logs -gt 0 ]]; then
+    opt_enable_rendering=0
 fi
 
 # TODO: Add more conversion methods
@@ -113,6 +118,7 @@ function _escape_content
 }
 function _render_html_details_summary
 {
+    local title
     title="${1}"
     if [[ -z "${title}" ]]; then
         title="Details"
@@ -173,7 +179,7 @@ function _render_command_plan
         raw_log=$(echo "${raw_log}" | sed -e '/./,$!d' -e :a -e '/^\n*$/{$d;N;ba' -e '}')
         if [[ -n "${raw_log}" ]]; then
             # Plan clean up rules stolen from https://github.com/gunkow/terraform-pr-commenter
-            raw_log=$(echo "${raw_log}" | sed -r '/^(An execution plan has been generated and is shown below.|Terraform used the selected providers to generate the following execution|plan. Resource actions are indicated with the following symbols:|Note: Objects have changed outside of Terraform)$/d') # Strip refresh section
+            #raw_log=$(echo "${raw_log}" | sed -r '/^(An execution plan has been generated and is shown below.|Terraform used the selected providers to generate the following execution|plan. Resource actions are indicated with the following symbols:|Note: Objects have changed outside of Terraform)$/d') # Strip refresh section
             raw_log=$(echo "${raw_log}" | sed -r '/Plan: /q') # Ignore everything after plan summary
             raw_log=${raw_log::65300} # GitHub has a 65535-char comment limit - truncate plan, leaving space for comment wrapper
             raw_log=$(echo "${raw_log}" | sed -r 's/^([[:blank:]]*)([-+~])/\2\1/g') # Move any diff characters to start of line
@@ -215,7 +221,7 @@ logs_collected=0
 echolog "Rendering Terraform ${arg_tf_command} comment from ${arg_logs_path}"
 
 # Render comment title
-if [[ $arg_dry_run_list_logs -eq 0 ]]; then
+if [[ $opt_enable_rendering -gt 0 ]]; then
     comment="## Build "
     if [[ -n "${arg_build_url}" ]]; then
         comment+="[${arg_build_number}](${arg_build_url})"
@@ -223,13 +229,13 @@ if [[ $arg_dry_run_list_logs -eq 0 ]]; then
         comment+="\`${arg_build_number}\`"
     fi
     if [[ -n "${arg_build_env}" ]]; then
-        comment+=" - Environment: \`${arg_build_env}\`"
+        comment+=" Environment: \`${arg_build_env}\`"
     fi
-    comment+="- Terraform: \`${arg_tf_command}\`\n\n"
+    comment+=" Terraform: \`${arg_tf_command}\`\n\n"
 fi
 
 # Render comment body: open outer <details>, optional
-if [[ $arg_dry_run_list_logs -eq 0 ]] && [[ $arg_disable_outer_details -ne 1 ]]; then
+if [[ $opt_enable_rendering -gt 0 ]] && [[ $arg_disable_outer_details -ne 1 ]]; then
     comment+="<details>$(_render_html_details_summary "Run Details")"
 fi
 
@@ -238,6 +244,9 @@ for log_file in $(ls --sort=version "${arg_logs_path}"/*."${arg_tf_command}".{lo
     echolog "Rendering ${arg_tf_command} output from ${log_file}"
     if [[ $arg_dry_run_list_logs -gt 0 ]]; then
         echo "${log_file}"
+    fi
+
+    if [[ $opt_enable_rendering -eq 0 ]]; then
         continue
     fi
     # Render section title
@@ -255,13 +264,13 @@ for log_file in $(ls --sort=version "${arg_logs_path}"/*."${arg_tf_command}".{lo
 done
 
 # Render comment body: close outer <details>, optional
-if [[ $arg_dry_run_list_logs -eq 0 ]] && [[ $arg_disable_outer_details -ne 1 ]]; then
+if [[ $opt_enable_rendering -gt 0 ]] && [[ $arg_disable_outer_details -ne 1 ]]; then
     comment+="</details>\n"
 fi
 
 # Return result
 echolog "Exporting TERRAFORM_COMMAND_PR_COMMENT environment variable"
-if [[ $arg_dry_run_list_logs -eq 0 ]] && [[ $logs_collected -gt 0 ]]; then
+if [[ $opt_enable_rendering -gt 0 ]] && [[ $logs_collected -gt 0 ]]; then
     # GitHub API uses \r\n as line breaks in bodies
     # https://github.com/actions/runner/issues/1462#issuecomment-1030124116
     TERRAFORM_COMMAND_PR_COMMENT="${comment//\\n/%0D%0A}"
