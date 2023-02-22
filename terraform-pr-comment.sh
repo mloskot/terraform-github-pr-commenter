@@ -119,7 +119,7 @@ function _escape_content
             escaped=$("${1}" | konwert utf8-ascii)
         fi
         # shellcheck disable=SC2001
-        echo "${escaped}" | sed s/^\?//g
+        echo "${escaped}" | sed s/^\?//g | sed -E ':a;N;$!ba;s/\r{0,1}\n/\\n/g'
         # FIXME: This breaks content of code blocks: | sed -E ':a;N;$!ba;s/\r{0,1}\n/\\n/g'
     fi
 }
@@ -277,10 +277,11 @@ fi
 ### Render comment title
 comment_title=""
 if [[ $cfg_enable_rendering -gt 0 ]]; then
+    comment_title+="## Terraform"
     if [[ -n "${arg_build_url}" ]]; then
-        comment_title+="## [${arg_build_number}](${arg_build_url})"
+        comment_title+=" [${arg_build_number}](${arg_build_url})"
     else
-        comment_title+="## \`${arg_build_number}\`"
+        comment_title+=" \`${arg_build_number}\`"
     fi
     if [[ -n "${arg_build_env}" ]]; then
         comment_title+=" - \`${arg_build_env}\`"
