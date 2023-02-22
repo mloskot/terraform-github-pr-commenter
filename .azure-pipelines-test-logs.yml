@@ -15,7 +15,7 @@ pr:
     - test/logs/
     exclude:
     - test/docker/
-drafts: false
+  drafts: false
 
 pool:
   vmImage: ubuntu-latest
