@@ -271,7 +271,7 @@ done
 
 # Close outer <details>, optional
 if [[ $cfg_enable_rendering -gt 0 ]] && [[ $arg_disable_outer_details -ne 1 ]]; then
-    comment_body+="</details>\n"
+    comment_body+="</details>\n\n"
 fi
 
 ### Render comment title
@@ -288,7 +288,7 @@ if [[ $cfg_enable_rendering -gt 0 ]]; then
     if [[ -n "${section_component}" ]]; then
         comment_title+=" - \`${section_component}\`"
     fi
-    comment_title+=" - \`${arg_tf_command}\` "
+    comment_title+=" - \`${arg_tf_command}\`\n\n"
 fi
 
 # Return result
