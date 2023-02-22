@@ -20,8 +20,9 @@ function usage
     echo "  -v,--verbose                Advertise detailed steps and actions (pass first for arguments logging)"
     echo "  -c,--command <name>         Terraform command: fmt, plan, validate"
     echo "  -p,--logs-path <path>       Location where to look for log files with Terraform command output"
-    echo "  -b,--build-number <number>  Build number or identifier provided by CI/CD service"
-    echo "  -u,--build-url <url>        Build results URL provided by CI/CD service"
+    echo "  -b,--build-number <number>  Build number or identifier provided by CI/CD service (for comment title)"
+    echo "  -u,--build-url <url>        Build results URL provided by CI/CD service (for comment title)"
+    echo "  -e,--build-env <name>       Name of environment or stage of this build (for comment title)"
     echo "  -d,--disable-outer-details  Disable outer HTML <details> section"
     echo "  -l,--dry-run-list-logs      Dry run listing log files only"
     echo "  -h,--help                   Displays this message"
@@ -51,6 +52,7 @@ arg_tf_command=""
 arg_logs_path=""
 arg_build_number=""
 arg_build_url=""
+arg_build_env=""
 arg_verbose=0
 arg_disable_outer_details=0
 arg_dry_run_list_logs=0
@@ -62,6 +64,7 @@ do
         -p|--logs-path) test ! -z "$2" && arg_logs_path=$2; echolog "Setting logs path: ${arg_logs_path}"; shift;;
         -b|--build-number) test ! -z "$2" && arg_build_number=$2; echolog "Setting build number: ${arg_build_number}"; shift;;
         -u|--build-url) test ! -z "$2" && arg_build_url=$2; echolog "Setting build url: ${arg_build_url}"; shift;;
+        -e|--build-env) test ! -z "$2" && arg_build_env=$2; echolog "Setting build env: ${arg_build_env}"; shift;;
         -d|--disable-outer-details) arg_disable_outer_details=1; echolog "Disabling outer details";;
         -l|--dry-run-list-logs) arg_dry_run_list_logs=1; echolog "Dry run listing logs"; shift;;
         -h|--help) usage;;
@@ -210,13 +213,22 @@ function _render_command_validate
 logs_collected=0
 
 echolog "Rendering Terraform ${arg_tf_command} comment from ${arg_logs_path}"
-if [[ $arg_dry_run_list_logs -eq 0 ]] && [[ -n "${arg_build_url}" ]]; then
-    comment="## Build [${arg_build_number}](${arg_build_url}): Terraform \`${arg_tf_command}\`\n\n"
-else
-    comment="## Build \`${arg_build_number}\`: Terraform \`${arg_tf_command}\`\n\n"
+
+# Render comment title
+if [[ $arg_dry_run_list_logs -eq 0 ]]; then
+    comment="## Build "
+    if [[ -n "${arg_build_url}" ]]; then
+        comment+="[${arg_build_number}](${arg_build_url})"
+    else
+        comment+="\`${arg_build_number}\`"
+    fi
+    if [[ -n "${arg_build_env}" ]]; then
+        comment+=" - Environment: \`${arg_build_env}\`"
+    fi
+    comment+="- Terraform: \`${arg_tf_command}\`\n\n"
 fi
 
-# Open outer <details>, optional
+# Render comment body: open outer <details>, optional
 if [[ $arg_dry_run_list_logs -eq 0 ]] && [[ $arg_disable_outer_details -ne 1 ]]; then
     comment+="<details>$(_render_html_details_summary "Run Details")"
 fi
@@ -242,11 +254,12 @@ for log_file in $(ls --sort=version "${arg_logs_path}"/*."${arg_tf_command}".{lo
     ((++logs_collected))
 done
 
-# Close outer <details>, optional
+# Render comment body: close outer <details>, optional
 if [[ $arg_dry_run_list_logs -eq 0 ]] && [[ $arg_disable_outer_details -ne 1 ]]; then
     comment+="</details>\n"
 fi
 
+# Return result
 echolog "Exporting TERRAFORM_COMMAND_PR_COMMENT environment variable"
 if [[ $arg_dry_run_list_logs -eq 0 ]] && [[ $logs_collected -gt 0 ]]; then
     # GitHub API uses \r\n as line breaks in bodies
