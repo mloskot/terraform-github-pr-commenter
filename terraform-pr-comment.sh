@@ -275,19 +275,20 @@ if [[ $cfg_enable_rendering -gt 0 ]] && [[ $arg_disable_outer_details -ne 1 ]]; 
 fi
 
 ### Render comment title
+comment_title=""
 if [[ $cfg_enable_rendering -gt 0 ]]; then
-    comment_title="## Terraform \`${arg_tf_command}\` "
     if [[ -n "${arg_build_url}" ]]; then
-        comment_title+="[${arg_build_number}](${arg_build_url})"
+        comment_title+="## [${arg_build_number}](${arg_build_url})"
     else
-        comment_title+="\`${arg_build_number}\`"
+        comment_title+="## \`${arg_build_number}\`"
     fi
     if [[ -n "${arg_build_env}" ]]; then
-        comment_title+=" - Environment: \`${arg_build_env}\`"
+        comment_title+=" - \`${arg_build_env}\`"
     fi
     if [[ -n "${section_component}" ]]; then
-        comment_title+=" - Component: \`${section_component}\`"
+        comment_title+=" - \`${section_component}\`"
     fi
+    comment_title+=" - \`${arg_tf_command}\` "
 fi
 
 # Return result
