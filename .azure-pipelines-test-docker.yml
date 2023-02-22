@@ -31,6 +31,7 @@ steps:
           --logs-path '$(TerraformLogsPath)' \
           --build-number '$(Build.BuildNumber)' \
           --build-url '$(TerraformBuildUrl)' \
+          --build-env 'DEV' \
           --disable-outer-details
         echo "##vso[task.setvariable variable=TERRAFORM_VALIDATE_PR_COMMENT]$TERRAFORM_COMMAND_PR_COMMENT"
       displayName: 'Render PR Comment - Terraform validate'
@@ -68,6 +69,7 @@ steps:
           --logs-path '$(TerraformLogsPath)' \
           --build-number '$(Build.BuildNumber)' \
           --build-url '$(TerraformBuildUrl)'
+          --build-env 'PROD' \
         echo "##vso[task.setvariable variable=TERRAFORM_PLAN_PR_COMMENT]$TERRAFORM_COMMAND_PR_COMMENT"
       displayName: 'Render PR Comment - Terraform plan'
     - task: GitHubComment@0
