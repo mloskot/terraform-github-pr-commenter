@@ -23,10 +23,11 @@ Obtain initial batch of logs using the `<ordinal>_<component>.<command>.{log,jso
 naming (see [README.md](../../README.md):
 
 ```shell
-terraform validate -no-color            > 001_docker-step-2-build.validate.log
-terraform fmt -no-color -check -diff    > 001_docker-step-2-build.fmt.log
-terraform plan -no-color                > 001_docker-step-2-build.plan.log
-terraform show -no-color -json          > 001_docker-step-2-build.plan.json
+terraform validate -no-color                > 001_docker-step-2-build.validate.log
+terraform fmt -no-color -check -diff        > 001_docker-step-2-build.fmt.log
+terraform plan -no-color -out=plan.tfplan
+terraform show -no-color plan.tfplan        > 001_docker-step-2-build.plan.log
+terraform show -no-color -json plan.tfplan  > 001_docker-step-2-build.plan.json
 ```
 
 Note, comment for the `validate` command will be generated with outer `<details>`
@@ -44,10 +45,11 @@ e.g. Azure Pipelines task `GitHubCommenter@0`, GitHub Script or just `curl`.
 Obtain new set of logs:
 
 ```shell
-terraform validate -no-color            > 002_docker-step-4-change.validate.log
-terraform fmt -no-color -check -diff    > 002_docker-step-4-change.fmt.log
-terraform plan -no-color                > 002_docker-step-4-change.plan.log
-terraform show -no-color -json          > 002_docker-step-4-change.plan.json
+terraform validate -no-color                > 002_docker-step-4-change.validate.log
+terraform fmt -no-color -check -diff        > 002_docker-step-4-change.fmt.log
+terraform plan -no-color -out=plan.tfplan
+terraform show -no-color plan.tfplan        > 002_docker-step-4-change.plan.log
+terraform show -no-color -json plan.tfplan  > 002_docker-step-4-change.plan.json
 ```
 
 ## 5. Remove Infrastructure Resources
@@ -60,8 +62,9 @@ Delete resources from `main.tf`
 and obtain logs of the new state:
 
 ```shell
-terraform validate -no-color            > 003_docker-step-5-change.validate.log
-terraform fmt -no-color -check -diff    > 003_docker-step-5-change.fmt.log
-terraform plan -no-color                > 003_docker-step-5-change.plan.log
-terraform show -no-color -json          > 003_docker-step-5-change.plan.json
+terraform validate -no-color                > 003_docker-step-5-change.validate.log
+terraform fmt -no-color -check -diff        > 003_docker-step-5-change.fmt.log
+terraform plan -no-color -out=plan.tfplan
+terraform show -no-color plan.tfplan        > 003_docker-step-5-change.plan.log
+terraform show -no-color -json plan.tfplan  > 003_docker-step-5-change.plan.json
 ```
