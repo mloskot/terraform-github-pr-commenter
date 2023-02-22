@@ -95,6 +95,7 @@ fi
 cfg_enable_single_file=0
 if [[ -f "${arg_logs_path}" ]]; then
     cfg_enable_single_file=1
+    arg_disable_outer_details=1
 fi
 
 ### Check required tools
