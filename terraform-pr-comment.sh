@@ -14,15 +14,16 @@ VERSION="0.3.0"
 # <title> part is used as heading of section for given log
 # <command> used in the comment title together with given build number
 #
-usage()
+function usage
 {
     echo "Usage: $0 [arguments]"
     echo "  -v,--verbose                Advertise detailed steps and actions (pass first for arguments logging)"
     echo "  -c,--command <name>         Terraform command: fmt, plan, validate"
-    echo "  -l,--logs-path <path>       Location where to look for log files with Terraform command output"
+    echo "  -p,--logs-path <path>       Location where to look for log files with Terraform command output"
     echo "  -b,--build-number <number>  Build number or identifier provided by CI/CD service"
     echo "  -u,--build-url <url>        Build results URL provided by CI/CD service"
     echo "  -d,--disable-outer-details  Disable outer HTML <details> section"
+    echo "  -l,--dry-run-list-logs      Dry run listing log files only"
     echo "  -h,--help                   Displays this message"
     exit 1
 }
@@ -52,15 +53,17 @@ arg_build_number=""
 arg_build_url=""
 arg_verbose=0
 arg_disable_outer_details=0
+arg_dry_run_list_logs=0
 while [[ $# -gt 0 ]];
 do
     case $1 in
         -v|--verbose) arg_verbose=1; echolog "Enabling verbose logging";;
         -c|--command)  test ! -z "$2" && arg_tf_command=$2; echolog "Setting command: ${arg_tf_command}"; shift;;
-        -l|--logs-path) test ! -z "$2" && arg_logs_path=$2; echolog "Setting logs path: ${arg_logs_path}"; shift;;
+        -p|--logs-path) test ! -z "$2" && arg_logs_path=$2; echolog "Setting logs path: ${arg_logs_path}"; shift;;
         -b|--build-number) test ! -z "$2" && arg_build_number=$2; echolog "Setting build number: ${arg_build_number}"; shift;;
         -u|--build-url) test ! -z "$2" && arg_build_url=$2; echolog "Setting build url: ${arg_build_url}"; shift;;
         -d|--disable-outer-details) arg_disable_outer_details=1; echolog "Disabling outer details";;
+        -l|--dry-run-list-logs) arg_dry_run_list_logs=1; echolog "Dry run listing logs"; shift;;
         -h|--help) usage;;
         *) echolog "Unknown argument: $1"; usage;;
     esac;
@@ -207,20 +210,24 @@ function _render_command_validate
 logs_collected=0
 
 echolog "Rendering Terraform ${arg_tf_command} comment from ${arg_logs_path}"
-if [[ -n "${arg_build_url}" ]]; then
+if [[ $arg_dry_run_list_logs -eq 0 ]] && [[ -n "${arg_build_url}" ]]; then
     comment="## Build [${arg_build_number}](${arg_build_url}): Terraform \`${arg_tf_command}\`\n\n"
 else
     comment="## Build \`${arg_build_number}\`: Terraform \`${arg_tf_command}\`\n\n"
 fi
 
 # Open outer <details>, optional
-if [[ $arg_disable_outer_details -ne 1 ]]; then
+if [[ $arg_dry_run_list_logs -eq 0 ]] && [[ $arg_disable_outer_details -ne 1 ]]; then
     comment+="<details>$(_render_html_details_summary "Run Details")"
 fi
 
 # shellcheck disable=SC2045
 for log_file in $(ls --sort=version "${arg_logs_path}"/*."${arg_tf_command}".{log,txt} 2>/dev/null); do
     echolog "Rendering ${arg_tf_command} output from ${log_file}"
+    if [[ $arg_dry_run_list_logs -gt 0 ]]; then
+        echo "${log_file}"
+        continue
+    fi
     # Render section title
     section=$(basename "${log_file}")
     section=$(echo "${section}" | cut -d '_' -f 2 | cut -d . -f 1)
@@ -236,12 +243,12 @@ for log_file in $(ls --sort=version "${arg_logs_path}"/*."${arg_tf_command}".{lo
 done
 
 # Close outer <details>, optional
-if [[ $arg_disable_outer_details -ne 1 ]]; then
+if [[ $arg_dry_run_list_logs -eq 0 ]] && [[ $arg_disable_outer_details -ne 1 ]]; then
     comment+="</details>\n"
 fi
 
 echolog "Exporting TERRAFORM_COMMAND_PR_COMMENT environment variable"
-if [[ $logs_collected -gt 0 ]]; then
+if [[ $arg_dry_run_list_logs -eq 0 ]] && [[ $logs_collected -gt 0 ]]; then
     # GitHub API uses \r\n as line breaks in bodies
     # https://github.com/actions/runner/issues/1462#issuecomment-1030124116
     TERRAFORM_COMMAND_PR_COMMENT="${comment//\\n/%0D%0A}"

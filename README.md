@@ -22,7 +22,7 @@ See [screenshot/README.md](screenshot/README.md) for more visual samples of post
 Usage: ./terraform-pr-comment.sh [arguments]
   -v,--verbose                Advertise detailed steps and actions (pass first for arguments logging)
   -c,--command <name>         Terraform command: fmt, plan, validate
-  -l,--logs-path <path>       Location where to look for log files with Terraform command output
+  -p,--logs-path <path>       Location where to look for log files with Terraform command output
   -b,--build-number <number>  Build number or identifier provided by CI/CD service
   -u,--build-url <url>        Build results URL provided by CI/CD service
   -d,--disable-outer-details  Disable outer HTML <details> section
