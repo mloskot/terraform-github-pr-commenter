@@ -1,15 +1,22 @@
+---
 # Pipeline for test/docker infrastructure
 # Pipeline renders comment content and, if run for GitHub PR,
 # posts the comment to the GitHub PR that triggered the comment,
+name: 0.$(System.PullRequest.PullRequestId)$(Rev:.r)-pr
+
+trigger: none
+
 pr:
+  autoCancel: true
   branches:
     include:
-    - main
+      - main
   paths:
     include:
     - test/docker/
     exclude:
     - test/logs/
+drafts: false
 
 pool:
   vmImage: ubuntu-latest

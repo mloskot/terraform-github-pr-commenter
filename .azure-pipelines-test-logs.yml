@@ -1,15 +1,21 @@
 # Pipeline for static test/logs
 # Pipeline renders comment content and, if run for GitHub PR,
 # posts the comment to the GitHub PR that triggered the comment,
+name: 0.$(System.PullRequest.PullRequestId)$(Rev:.r)-pr
+
+trigger: none
+
 pr:
+  autoCancel: true
   branches:
     include:
-    - main
+      - main
   paths:
     include:
     - test/logs/
     exclude:
     - test/docker/
+drafts: false
 
 pool:
   vmImage: ubuntu-latest
