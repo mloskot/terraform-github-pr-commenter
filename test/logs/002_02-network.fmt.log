@@ -1,0 +1,12 @@
+main.tf
+--- old/main.tf
++++ new/main.tf
+@@ -217,8 +217,8 @@
+   source = "../../../../../modules/azure/terraform_azurerm_vnet_peering"
+
+   providers = {
+-azurerm.src = azurerm
+-azurerm.dst = azurerm
++    azurerm.src = azurerm
++    azurerm.dst = azurerm
+   }

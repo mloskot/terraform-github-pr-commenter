@@ -10,13 +10,13 @@ Terraform will perform the following actions:
 
   # azurerm_private_dns_zone.private_dns_zone must be replaced
 -/+ resource "azurerm_private_dns_zone" "private_dns_zone" {
-      ~ id                                                    = "/subscriptions/1b298c01-0747-469e-8955-af1486a97bc4/resourceGroups/rg-base-example-dev/providers/Microsoft.Network/privateDnsZones/example.dev" -> (known after apply)
+      ~ id                                                    = "/subscriptions/1b298c01-0747-469e-8955-af1486a97bc4/resourceGroups/rg-aks-example-dev/providers/Microsoft.Network/privateDnsZones/example.dev" -> (known after apply)
       ~ max_number_of_record_sets                             = 25000 -> (known after apply)
       ~ max_number_of_virtual_network_links                   = 1000 -> (known after apply)
       ~ max_number_of_virtual_network_links_with_registration = 100 -> (known after apply)
       ~ name                                                  = "example.dev" -> "demo.dev" # forces replacement
       ~ number_of_record_sets                                 = 1 -> (known after apply)
-      ~ resource_group_name                                   = "rg-base-example-dev" -> (known after apply) # forces replacement
+      ~ resource_group_name                                   = "rg-aks-example-dev" -> (known after apply) # forces replacement
       ~ tags                                                  = {
           ~ "owner"       = "example" -> "demo"
             # (2 unchanged elements hidden)
@@ -64,7 +64,7 @@ Terraform will perform the following actions:
               - key_vault_key_id   = ""
             },
         ] -> (known after apply)
-      ~ id                            = "/subscriptions/1b298c01-0747-469e-8955-af1486a97bc4/resourceGroups/rg-base-example-dev/providers/Microsoft.ContainerRegistry/registries/crexample" -> (known after apply)
+      ~ id                            = "/subscriptions/1b298c01-0747-469e-8955-af1486a97bc4/resourceGroups/rg-aks-example-dev/providers/Microsoft.ContainerRegistry/registries/crexample" -> (known after apply)
       ~ login_server                  = "crexample.azurecr.io" -> (known after apply)
       ~ name                          = "crexample" -> (known after apply) # forces replacement
       ~ network_rule_set              = [
@@ -75,7 +75,7 @@ Terraform will perform the following actions:
             },
         ] -> (known after apply)
       - quarantine_policy_enabled     = false -> null
-      ~ resource_group_name           = "rg-base-example-dev" -> (known after apply) # forces replacement
+      ~ resource_group_name           = "rg-aks-example-dev" -> (known after apply) # forces replacement
       ~ retention_policy              = [
           - {
               - days    = 7
@@ -191,7 +191,7 @@ Terraform will perform the following actions:
                   - "SetRotationPolicy",
                   - "Rotate",
                 ]
-              - object_id               = "266565d1-ef85-4b32-867d-5d8a405dabf1"
+              - object_id               = "26af089f-2182-4845-8308-49fc53a14123"
               - secret_permissions      = [
                   - "Get",
                   - "List",
@@ -218,9 +218,9 @@ Terraform will perform the following actions:
             },
         ] -> (known after apply)
       ~ enable_rbac_authorization       = true -> false
-      ~ id                              = "/subscriptions/1b298c01-0747-469e-8955-af1486a97bc4/resourceGroups/rg-base-example-dev/providers/Microsoft.KeyVault/vaults/kv-base-example-uks-dev" -> (known after apply)
+      ~ id                              = "/subscriptions/1b298c01-0747-469e-8955-af1486a97bc4/resourceGroups/rg-aks-example-dev/providers/Microsoft.KeyVault/vaults/kv-base-example-uks-dev" -> (known after apply)
       ~ name                            = "kv-base-example-uks-dev" -> (known after apply) # forces replacement
-      ~ resource_group_name             = "rg-base-example-dev" -> (known after apply) # forces replacement
+      ~ resource_group_name             = "rg-aks-example-dev" -> (known after apply) # forces replacement
       ~ tags                            = {
           ~ "owner" = "example" -> "demo"
             # (2 unchanged elements hidden)
@@ -292,13 +292,13 @@ Terraform will perform the following actions:
   # module.keyvault.azurerm_role_assignment.rbac_keyvault_administrator["ae622e27-c608-4875-9d25-4ff8b6273682"] will be destroyed
   # (because key ["ae622e27-c608-4875-9d25-4ff8b6273682"] is not in for_each map)
   - resource "azurerm_role_assignment" "rbac_keyvault_administrator" {
-      - id                   = "/subscriptions/1b298c01-0747-469e-8955-af1486a97bc4/resourceGroups/rg-base-example-dev/providers/Microsoft.KeyVault/vaults/kv-base-example-uks-dev/providers/Microsoft.Authorization/roleAssignments/377069dd-71d8-9a6b-02af-0da3d8b56e1f" -> null
+      - id                   = "/subscriptions/1b298c01-0747-469e-8955-af1486a97bc4/resourceGroups/rg-aks-example-dev/providers/Microsoft.KeyVault/vaults/kv-base-example-uks-dev/providers/Microsoft.Authorization/roleAssignments/377069dd-71d8-9a6b-02af-0da3d8b56e1f" -> null
       - name                 = "377069dd-71d8-9a6b-02af-0da3d8b56e1f" -> null
       - principal_id         = "ae622e27-c608-4875-9d25-4ff8b6273682" -> null
       - principal_type       = "Group" -> null
       - role_definition_id   = "/subscriptions/1b298c01-0747-469e-8955-af1486a97bc4/providers/Microsoft.Authorization/roleDefinitions/00482a5a-887f-4fb3-b363-3b7fe8e74483" -> null
       - role_definition_name = "Key Vault Administrator" -> null
-      - scope                = "/subscriptions/1b298c01-0747-469e-8955-af1486a97bc4/resourceGroups/rg-base-example-dev/providers/Microsoft.KeyVault/vaults/kv-base-example-uks-dev" -> null
+      - scope                = "/subscriptions/1b298c01-0747-469e-8955-af1486a97bc4/resourceGroups/rg-aks-example-dev/providers/Microsoft.KeyVault/vaults/kv-base-example-uks-dev" -> null
     }
 
   # module.log_analytics.data.external.generate_storage_sas_token will be read during apply
@@ -339,19 +339,19 @@ Terraform will perform the following actions:
 
   # module.log_analytics.azurerm_advanced_threat_protection.storage_threat_protection must be replaced
 -/+ resource "azurerm_advanced_threat_protection" "storage_threat_protection" {
-      ~ id                 = "/subscriptions/1b298c01-0747-469e-8955-af1486a97bc4/resourceGroups/rg-base-example-dev/providers/Microsoft.Storage/storageAccounts/examplelog/providers/Microsoft.Security/advancedThreatProtectionSettings/current" -> (known after apply)
-      ~ target_resource_id = "/subscriptions/1b298c01-0747-469e-8955-af1486a97bc4/resourceGroups/rg-base-example-dev/providers/Microsoft.Storage/storageAccounts/examplelog" -> (known after apply) # forces replacement
+      ~ id                 = "/subscriptions/1b298c01-0747-469e-8955-af1486a97bc4/resourceGroups/rg-aks-example-dev/providers/Microsoft.Storage/storageAccounts/examplelog/providers/Microsoft.Security/advancedThreatProtectionSettings/current" -> (known after apply)
+      ~ target_resource_id = "/subscriptions/1b298c01-0747-469e-8955-af1486a97bc4/resourceGroups/rg-aks-example-dev/providers/Microsoft.Storage/storageAccounts/examplelog" -> (known after apply) # forces replacement
         # (1 unchanged attribute hidden)
     }
 
   # module.log_analytics.azurerm_log_analytics_workspace.log_workspace must be replaced
 -/+ resource "azurerm_log_analytics_workspace" "log_workspace" {
       - cmk_for_query_forced               = false -> null
-      ~ id                                 = "/subscriptions/1b298c01-0747-469e-8955-af1486a97bc4/resourceGroups/rg-base-example-dev/providers/Microsoft.OperationalInsights/workspaces/log-base-example-uks-dev" -> (known after apply)
+      ~ id                                 = "/subscriptions/1b298c01-0747-469e-8955-af1486a97bc4/resourceGroups/rg-aks-example-dev/providers/Microsoft.OperationalInsights/workspaces/log-base-example-uks-dev" -> (known after apply)
       ~ name                               = "log-base-example-uks-dev" -> (known after apply) # forces replacement
       ~ primary_shared_key                 = (sensitive value)
       + reservation_capacity_in_gb_per_day = (known after apply)
-      ~ resource_group_name                = "rg-base-example-dev" -> (known after apply) # forces replacement
+      ~ resource_group_name                = "rg-aks-example-dev" -> (known after apply) # forces replacement
       ~ secondary_shared_key               = (sensitive value)
       ~ tags                               = {
           + "new-tag" = "false"
@@ -365,7 +365,7 @@ Terraform will perform the following actions:
   # module.log_analytics.azurerm_storage_account.storage_logs must be replaced
 -/+ resource "azurerm_storage_account" "storage_logs" {
       ~ access_tier                       = "Hot" -> (known after apply)
-      ~ id                                = "/subscriptions/1b298c01-0747-469e-8955-af1486a97bc4/resourceGroups/rg-base-example-dev/providers/Microsoft.Storage/storageAccounts/examplelog" -> (known after apply)
+      ~ id                                = "/subscriptions/1b298c01-0747-469e-8955-af1486a97bc4/resourceGroups/rg-aks-example-dev/providers/Microsoft.Storage/storageAccounts/examplelog" -> (known after apply)
       + large_file_share_enabled          = (known after apply)
         name                              = "examplelog"
       ~ primary_access_key                = (sensitive value)
@@ -384,7 +384,7 @@ Terraform will perform the following actions:
       ~ primary_table_host                = "examplelog.table.core.windows.net" -> (known after apply)
       ~ primary_web_endpoint              = "https://examplelog.z33.web.core.windows.net/" -> (known after apply)
       ~ primary_web_host                  = "examplelog.z33.web.core.windows.net" -> (known after apply)
-      ~ resource_group_name               = "rg-base-example-dev" -> (known after apply) # forces replacement
+      ~ resource_group_name               = "rg-aks-example-dev" -> (known after apply) # forces replacement
       ~ secondary_access_key              = (sensitive value)
       + secondary_blob_connection_string  = (sensitive value)
       + secondary_blob_endpoint           = (known after apply)
@@ -513,8 +513,8 @@ Terraform will perform the following actions:
 
   # module.log_analytics.azurerm_storage_management_policy.archive_storage[0] must be replaced
 -/+ resource "azurerm_storage_management_policy" "archive_storage" {
-      ~ id                 = "/subscriptions/1b298c01-0747-469e-8955-af1486a97bc4/resourceGroups/rg-base-example-dev/providers/Microsoft.Storage/storageAccounts/examplelog/managementPolicies/default" -> (known after apply)
-      ~ storage_account_id = "/subscriptions/1b298c01-0747-469e-8955-af1486a97bc4/resourceGroups/rg-base-example-dev/providers/Microsoft.Storage/storageAccounts/examplelog" -> (known after apply) # forces replacement
+      ~ id                 = "/subscriptions/1b298c01-0747-469e-8955-af1486a97bc4/resourceGroups/rg-aks-example-dev/providers/Microsoft.Storage/storageAccounts/examplelog/managementPolicies/default" -> (known after apply)
+      ~ storage_account_id = "/subscriptions/1b298c01-0747-469e-8955-af1486a97bc4/resourceGroups/rg-aks-example-dev/providers/Microsoft.Storage/storageAccounts/examplelog" -> (known after apply) # forces replacement
 
       ~ rule {
             name    = "Archive"
@@ -533,7 +533,7 @@ Terraform will perform the following actions:
 -/+ resource "azurecaf_name" "rg" {
       ~ id            = "hgovayvauumnhejb" -> (known after apply)
         name          = "base"
-      ~ result        = "rg-base-example-dev" -> (known after apply)
+      ~ result        = "rg-aks-example-dev" -> (known after apply)
       ~ results       = {} -> (known after apply)
       ~ suffixes      = [ # forces replacement
           - "example",
@@ -545,8 +545,8 @@ Terraform will perform the following actions:
 
   # module.resource_group.azurerm_resource_group.main_rg must be replaced
 -/+ resource "azurerm_resource_group" "main_rg" {
-      ~ id       = "/subscriptions/1b298c01-0747-469e-8955-af1486a97bc4/resourceGroups/rg-base-example-dev" -> (known after apply)
-      ~ name     = "rg-base-example-dev" -> (known after apply) # forces replacement
+      ~ id       = "/subscriptions/1b298c01-0747-469e-8955-af1486a97bc4/resourceGroups/rg-aks-example-dev" -> (known after apply)
+      ~ name     = "rg-aks-example-dev" -> (known after apply) # forces replacement
       ~ tags     = {
           ~ "owner" = "example" -> "demo"
             # (2 unchanged elements hidden)

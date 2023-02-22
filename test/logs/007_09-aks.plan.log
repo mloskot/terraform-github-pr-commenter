@@ -1,6 +1,0 @@
-
-Changes to Outputs:
-  ~ result = (sensitive value)
-
-You can apply this plan to save these new output values to the Terraform
-state, without changing any real infrastructure.
