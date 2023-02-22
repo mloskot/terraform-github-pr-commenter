@@ -20,7 +20,7 @@ function usage
     echo "Usage: $0 [arguments]"
     echo "  -v,--verbose                Advertise detailed steps and actions (pass first for arguments logging)"
     echo "  -c,--command <name>         Terraform command: fmt, plan, validate"
-    echo "  -p,--logs-path <path>       Location where to look for log files with Terraform command output"
+    echo "  -p,--logs-path <path>       Path to directory with log files or to single log file with Terraform command output"
     echo "  -b,--build-number <number>  Build number or identifier provided by CI/CD service (for comment title)"
     echo "  -u,--build-url <url>        Build results URL provided by CI/CD service (for comment title)"
     echo "  -e,--build-env <name>       Name of environment or stage of this build (for comment title)"
@@ -75,13 +75,13 @@ do
 done
 
 if [[ -z "$arg_tf_command" ]]; then
-    echolog "Missing terraform command"
+    echolog "Missing Terraform command"
 fi
 if [[ ! "$arg_tf_command" =~ ^(fmt|plan|validate)$ ]]; then
     echolog "Unsupported command ${arg_tf_command}. Valid commands: fmt, plan, validate."
 fi
-if [[ ! -d "$arg_logs_path" ]]; then
-    echolog "Missing path to terraform command output files"
+if [[ ! -d "$arg_logs_path" ]] && [[ ! -f "$arg_logs_path" ]]; then
+    echolog "Missing path to Terraform command output files"
 fi
 if [[ -z "$arg_build_number" ]]; then
     echolog "Missing build number"
@@ -244,8 +244,15 @@ if [[ $opt_enable_rendering -gt 0 ]] && [[ $arg_disable_outer_details -ne 1 ]]; 
     comment+="<details>$(_render_html_details_summary "Run Details")"
 fi
 
+
+if [[ -d "${arg_logs_path}" ]]; then
+    log_file_glob="${arg_logs_path}/*.${arg_tf_command}.{log,txt}"
+else
+    log_file_glob="${arg_logs_path}"
+fi
+
 # shellcheck disable=SC2045
-for log_file in $(ls --sort=version "${arg_logs_path}"/*."${arg_tf_command}".{log,txt} 2>/dev/null); do
+for log_file in $(ls --sort=version "${log_file_glob}" 2>/dev/null); do
     echolog "Rendering ${arg_tf_command} output from ${log_file}"
     if [[ $arg_dry_run_list_logs -gt 0 ]]; then
         echo "${log_file}"
