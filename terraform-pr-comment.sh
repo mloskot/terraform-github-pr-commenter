@@ -90,12 +90,17 @@ if [[ -n "$arg_build_url" ]]; then
     echolog "Using passed build URL $arg_build_url"
 fi
 
-# Check for any options given that disable comment rendering
-opt_enable_rendering=1
+### Check for any options given that disable comment rendering
+cfg_enable_rendering=1
 if [[ $arg_dry_run_list_logs -gt 0 ]]; then
-    opt_enable_rendering=0
+    cfg_enable_rendering=0
+fi
+cfg_enable_single_file=0
+if [[ -f "${arg_logs_path}" ]]; then
+    cfg_enable_single_file=1
 fi
 
+### Check required tools
 # TODO: Add more conversion methods
 if command -v "iconv" &> /dev/null; then
     echolog "Using iconv to escape comment content"
@@ -225,69 +230,77 @@ logs_collected=0
 
 echolog "Rendering Terraform ${arg_tf_command} comment from ${arg_logs_path}"
 
-# Render comment title
-if [[ $opt_enable_rendering -gt 0 ]]; then
-    comment="## Build "
-    if [[ -n "${arg_build_url}" ]]; then
-        comment+="[${arg_build_number}](${arg_build_url})"
-    else
-        comment+="\`${arg_build_number}\`"
-    fi
-    if [[ -n "${arg_build_env}" ]]; then
-        comment+=" - Environment: \`${arg_build_env}\`"
-    fi
-    comment+=" - Terraform: \`${arg_tf_command}\`\n\n"
-fi
-
-# Render comment body: open outer <details>, optional
-if [[ $opt_enable_rendering -gt 0 ]] && [[ $arg_disable_outer_details -ne 1 ]]; then
-    comment+="<details>$(_render_html_details_summary "Run Details")"
-fi
-
-
-if [[ -d "${arg_logs_path}" ]]; then
-    log_file_glob="${arg_logs_path}/*.${arg_tf_command}.{log,txt}"
+### Collect log files
+if [[ $cfg_enable_single_file -gt 0 ]]; then
+    log_files=$(ls "${arg_logs_path}" 2>/dev/null)
 else
-    log_file_glob="${arg_logs_path}"
+    log_files=$(ls --sort=version "${arg_logs_path}"/*."${arg_tf_command}".{log,txt} 2>/dev/null)
 fi
 
-# shellcheck disable=SC2045
-for log_file in $(ls --sort=version "${log_file_glob}" 2>/dev/null); do
-    echolog "Rendering ${arg_tf_command} output from ${log_file}"
+### Render comment body
+comment_body=""
+# Open outer <details>, optional
+if [[ $cfg_enable_rendering -gt 0 ]] && [[ $arg_disable_outer_details -ne 1 ]]; then
+    comment_body+="<details>$(_render_html_details_summary "Run Details")"
+fi
+
+section_component=""
+for log_file in $log_files; do
     if [[ $arg_dry_run_list_logs -gt 0 ]]; then
         echo "${log_file}"
+    else
+        echolog "Rendering ${arg_tf_command} output from ${log_file}"
     fi
 
-    if [[ $opt_enable_rendering -eq 0 ]]; then
+    if [[ $cfg_enable_rendering -eq 0 ]]; then
         continue
     fi
     # Render section title
-    section=$(basename "${log_file}")
-    section=$(echo "${section}" | cut -d '_' -f 2 | cut -d . -f 1)
-    comment+="### Component: \`${section}\`\n\n"
-    # Render section content
-    content=$(_render_command_"${arg_tf_command}"  "${log_file}")
-    if [[ -z "${content}" ]]; then
+    section_component=$(basename "${log_file}")
+    section_component=$(echo "${section_component}" | cut -d '_' -f 2 | cut -d . -f 1)
+    if [[ $cfg_enable_single_file -eq 0 ]]; then
+        comment_body+="### Component: \`${section_component}\`\n\n"
+        section_component=""
+    fi
+    # Render section body
+    section_body=$(_render_command_"${arg_tf_command}"  "${log_file}")
+    if [[ -z "${section_body}" ]]; then
         echoerr "Rendering ${arg_tf_command} output failed"
     fi
-    comment+="${content}"
+    comment_body+="${section_body}"
 
     ((++logs_collected))
 done
 
-# Render comment body: close outer <details>, optional
-if [[ $opt_enable_rendering -gt 0 ]] && [[ $arg_disable_outer_details -ne 1 ]]; then
-    comment+="</details>\n"
+# Close outer <details>, optional
+if [[ $cfg_enable_rendering -gt 0 ]] && [[ $arg_disable_outer_details -ne 1 ]]; then
+    comment_body+="</details>\n"
+fi
+
+### Render comment title
+if [[ $cfg_enable_rendering -gt 0 ]]; then
+    comment_title="## Terraform \`${arg_tf_command}\` "
+    if [[ -n "${arg_build_url}" ]]; then
+        comment_title+="[${arg_build_number}](${arg_build_url})"
+    else
+        comment_title+="\`${arg_build_number}\`"
+    fi
+    if [[ -n "${arg_build_env}" ]]; then
+        comment_title+=" - Environment: \`${arg_build_env}\`"
+    fi
+    if [[ -n "${section_component}" ]]; then
+        comment_title+=" - Component: \`${section_component}\`"
+    fi
 fi
 
 # Return result
 echolog "Exporting TERRAFORM_COMMAND_PR_COMMENT environment variable"
-if [[ $opt_enable_rendering -gt 0 ]] && [[ $logs_collected -gt 0 ]]; then
+TERRAFORM_COMMAND_PR_COMMENT=""
+if [[ $cfg_enable_rendering -gt 0 ]] && [[ $logs_collected -gt 0 ]]; then
     # GitHub API uses \r\n as line breaks in bodies
     # https://github.com/actions/runner/issues/1462#issuecomment-1030124116
-    TERRAFORM_COMMAND_PR_COMMENT="${comment//\\n/%0D%0A}"
-else
-    TERRAFORM_COMMAND_PR_COMMENT=""
+    TERRAFORM_COMMAND_PR_COMMENT+="${comment_title//\\n/%0D%0A}"
+    TERRAFORM_COMMAND_PR_COMMENT+="${comment_body//\\n/%0D%0A}"
 fi
 unset logs_collected
 unset comment
