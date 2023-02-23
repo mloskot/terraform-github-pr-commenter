@@ -1,7 +1,7 @@
 # Pipeline for static test/logs
 # Pipeline renders comment content and, if run for GitHub PR,
 # posts the comment to the GitHub PR that triggered the comment,
-name: 0.$(System.PullRequest.PullRequestId)$(Rev:.r)-pr
+name: PR-$(System.PullRequest.PullRequestNumber)-$(Date:yyyyMMdd)$(Rev:.r)
 
 trigger: none
 
