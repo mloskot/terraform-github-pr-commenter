@@ -14,8 +14,10 @@ pr:
   paths:
     include:
     - test/logs/
+    - .azure-pipelines-test-logs.yml
     exclude:
     - test/docker/
+    - .azure-pipelines-test-docker.yml
 
 pool:
   vmImage: ubuntu-latest
@@ -89,7 +91,8 @@ steps:
           --command fmt \
           --logs-path '$(TerraformLogsPath)//002_02-network.fmt.log' \
           --build-number '$(Build.BuildNumber)' \
-          --build-url '$(TerraformBuildUrl)'
+          --build-url '$(TerraformBuildUrl)' \
+          --build-env 'PROD'
         echo "##vso[task.setvariable variable=TERRAFORM_FMT_PR_COMMENT]$TERRAFORM_COMMAND_PR_COMMENT"
       displayName: 'Render PR Comment - single file - Terraform fmt'
     - task: GitHubComment@0
