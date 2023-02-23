@@ -284,13 +284,14 @@ if [[ $cfg_enable_rendering -gt 0 ]]; then
     else
         comment_title+=" \`${arg_build_number}\`"
     fi
-    comment_title+=": \`${arg_tf_command}\`\n\n"
+    comment_title+=": \`${arg_tf_command}\`"
     if [[ -n "${arg_build_env}" ]]; then
         comment_title+=" - \`${arg_build_env}\`"
     fi
     if [[ -n "${section_component}" ]]; then
         comment_title+=" - \`${section_component}\`"
     fi
+    comment_title+="\n\n"
 fi
 
 # Return result
