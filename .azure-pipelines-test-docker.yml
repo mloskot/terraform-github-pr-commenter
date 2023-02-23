@@ -1,10 +1,17 @@
+---
 # Pipeline for test/docker infrastructure
 # Pipeline renders comment content and, if run for GitHub PR,
 # posts the comment to the GitHub PR that triggered the comment,
+name: 0.$(System.PullRequest.PullRequestId)$(Rev:.r)-pr
+
+trigger: none
+
 pr:
+  autoCancel: true
+  drafts: false
   branches:
     include:
-    - main
+      - main
   paths:
     include:
     - test/docker/
@@ -23,59 +30,79 @@ steps:
         '$(System.DefaultWorkingDirectory)/terraform-pr-comment.sh' --help || exit 0
       displayName: 'Script Usage'
 
-    # Terraform validate (before fmt, otherwise fmt may issue validation errors)
-    - bash: |
-        source '$(System.DefaultWorkingDirectory)/terraform-pr-comment.sh' \
-          --verbose \
-          --command validate \
-          --logs-path '$(TerraformLogsPath)' \
-          --build-number '$(Build.BuildNumber)' \
-          --build-url '$(TerraformBuildUrl)' \
-          --build-env 'DEV' \
-          --disable-outer-details
-        echo "##vso[task.setvariable variable=TERRAFORM_VALIDATE_PR_COMMENT]$TERRAFORM_COMMAND_PR_COMMENT"
-      displayName: 'Render PR Comment - Terraform validate'
-    - task: GitHubComment@0
-      condition: and(eq(variables['Build.Reason'], 'PullRequest'), ne(variables['TERRAFORM_VALIDATE_PR_COMMENT'], ''))
-      inputs:
-        gitHubConnection: 'mloskot'
-        repositoryName: '$(Build.Repository.Name)'
-        comment: $(TERRAFORM_VALIDATE_PR_COMMENT)
-      displayName: 'Comment PR - Terraform validate'
+    # # Terraform validate (before fmt, otherwise fmt may issue validation errors)
+    # - bash: |
+    #     source '$(System.DefaultWorkingDirectory)/terraform-pr-comment.sh' \
+    #       --verbose \
+    #       --command validate \
+    #       --logs-path '$(TerraformLogsPath)' \
+    #       --build-number '$(Build.BuildNumber)' \
+    #       --build-url '$(TerraformBuildUrl)' \
+    #       --build-env 'DEV' \
+    #       --disable-outer-details
+    #     echo "##vso[task.setvariable variable=TERRAFORM_VALIDATE_PR_COMMENT]$TERRAFORM_COMMAND_PR_COMMENT"
+    #   displayName: 'Render PR Comment - Terraform validate'
+    # - task: GitHubComment@0
+    #   condition: and(eq(variables['Build.Reason'], 'PullRequest'), ne(variables['TERRAFORM_VALIDATE_PR_COMMENT'], ''))
+    #   inputs:
+    #     gitHubConnection: 'mloskot'
+    #     repositoryName: '$(Build.Repository.Name)'
+    #     comment: $(TERRAFORM_VALIDATE_PR_COMMENT)
+    #   displayName: 'Comment PR - Terraform validate'
 
-    # Terraform fmt
-    - bash: |
-        source '$(System.DefaultWorkingDirectory)/terraform-pr-comment.sh' \
-          --verbose \
-          --command fmt \
-          --logs-path '$(TerraformLogsPath)' \
-          --build-number '$(Build.BuildNumber)' \
-          --build-url '$(TerraformBuildUrl)'
-        echo "##vso[task.setvariable variable=TERRAFORM_FMT_PR_COMMENT]$TERRAFORM_COMMAND_PR_COMMENT"
-      displayName: 'Render PR Comment - Terraform fmt'
-    - task: GitHubComment@0
-      condition: and(eq(variables['Build.Reason'], 'PullRequest'), ne(variables['TERRAFORM_FMT_PR_COMMENT'], ''))
-      inputs:
-        gitHubConnection: 'mloskot'
-        repositoryName: '$(Build.Repository.Name)'
-        comment: $(TERRAFORM_FMT_PR_COMMENT)
-      displayName: 'Comment PR - Terraform fmt'
+    # # Terraform fmt
+    # - bash: |
+    #     source '$(System.DefaultWorkingDirectory)/terraform-pr-comment.sh' \
+    #       --verbose \
+    #       --command fmt \
+    #       --logs-path '$(TerraformLogsPath)' \
+    #       --build-number '$(Build.BuildNumber)' \
+    #       --build-url '$(TerraformBuildUrl)'
+    #     echo "##vso[task.setvariable variable=TERRAFORM_FMT_PR_COMMENT]$TERRAFORM_COMMAND_PR_COMMENT"
+    #   displayName: 'Render PR Comment - Terraform fmt'
+    # - task: GitHubComment@0
+    #   condition: and(eq(variables['Build.Reason'], 'PullRequest'), ne(variables['TERRAFORM_FMT_PR_COMMENT'], ''))
+    #   inputs:
+    #     gitHubConnection: 'mloskot'
+    #     repositoryName: '$(Build.Repository.Name)'
+    #     comment: $(TERRAFORM_FMT_PR_COMMENT)
+    #   displayName: 'Comment PR - Terraform fmt'
 
-    # Terraform plan
-    - bash: |
-        source '$(System.DefaultWorkingDirectory)/terraform-pr-comment.sh' \
-          --verbose \
-          --command plan \
-          --logs-path '$(TerraformLogsPath)' \
-          --build-number '$(Build.BuildNumber)' \
-          --build-url '$(TerraformBuildUrl)' \
-          --build-env 'PROD'
-        echo "##vso[task.setvariable variable=TERRAFORM_PLAN_PR_COMMENT]$TERRAFORM_COMMAND_PR_COMMENT"
-      displayName: 'Render PR Comment - Terraform plan'
-    - task: GitHubComment@0
-      condition: and(eq(variables['Build.Reason'], 'PullRequest'), ne(variables['TERRAFORM_PLAN_PR_COMMENT'], ''))
-      inputs:
-        gitHubConnection: 'mloskot'
-        repositoryName: '$(Build.Repository.Name)'
-        comment: $(TERRAFORM_PLAN_PR_COMMENT)
-      displayName: 'Comment PR - Terraform plan'
+    # # Terraform plan
+    # - bash: |
+    #     source '$(System.DefaultWorkingDirectory)/terraform-pr-comment.sh' \
+    #       --verbose \
+    #       --command plan \
+    #       --logs-path '$(TerraformLogsPath)' \
+    #       --build-number '$(Build.BuildNumber)' \
+    #       --build-url '$(TerraformBuildUrl)' \
+    #       --build-env 'PROD'
+    #     echo "##vso[task.setvariable variable=TERRAFORM_PLAN_PR_COMMENT]$TERRAFORM_COMMAND_PR_COMMENT"
+    #   displayName: 'Render PR Comment - Terraform plan'
+    # - task: GitHubComment@0
+    #   condition: and(eq(variables['Build.Reason'], 'PullRequest'), ne(variables['TERRAFORM_PLAN_PR_COMMENT'], ''))
+    #   inputs:
+    #     gitHubConnection: 'mloskot'
+    #     repositoryName: '$(Build.Repository.Name)'
+    #     comment: $(TERRAFORM_PLAN_PR_COMMENT)
+    #   displayName: 'Comment PR - Terraform plan'
+
+    # # Terraform plan - single file mode
+    # - bash: |
+    #     source '$(System.DefaultWorkingDirectory)/terraform-pr-comment.sh' \
+    #       --verbose \
+    #       --command plan \
+    #       --logs-path '$(TerraformLogsPath)/002_docker-step-4-change.plan.log' \
+    #       --build-number '$(Build.BuildNumber)' \
+    #       --build-url '$(TerraformBuildUrl)' \
+    #       --build-env 'DEV' \
+    #       --disable-outer-details
+    #     echo "##vso[task.setvariable variable=TERRAFORM_PLAN_PR_COMMENT]$TERRAFORM_COMMAND_PR_COMMENT"
+    #   displayName: 'Render PR Comment - single file - Terraform plan'
+    # - task: GitHubComment@0
+    #   condition: and(not(eq(variables['System.PullRequest.PullRequestId'], '')), ne(variables['TERRAFORM_PLAN_PR_COMMENT'], ''))
+    #   inputs:
+    #     gitHubConnection: 'mloskot'
+    #     repositoryName: '$(Build.Repository.Name)'
+    #     comment: $(TERRAFORM_PLAN_PR_COMMENT)
+    #   displayName: 'Comment PR - single file - Terraform plan'

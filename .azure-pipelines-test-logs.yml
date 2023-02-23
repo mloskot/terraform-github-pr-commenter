@@ -1,10 +1,16 @@
 # Pipeline for static test/logs
 # Pipeline renders comment content and, if run for GitHub PR,
 # posts the comment to the GitHub PR that triggered the comment,
+name: 0.$(System.PullRequest.PullRequestId)$(Rev:.r)-pr
+
+trigger: none
+
 pr:
+  autoCancel: true
+  drafts: false
   branches:
     include:
-    - main
+      - main
   paths:
     include:
     - test/logs/
@@ -75,3 +81,21 @@ steps:
         repositoryName: '$(Build.Repository.Name)'
         comment: $(TERRAFORM_PLAN_PR_COMMENT)
       displayName: 'Comment PR - Terraform plan'
+
+    # Terraform fmt (single mode)
+    - bash: |
+        source '$(System.DefaultWorkingDirectory)/terraform-pr-comment.sh' \
+          --verbose \
+          --command fmt \
+          --logs-path '$(TerraformLogsPath)//002_02-network.fmt.log' \
+          --build-number '$(Build.BuildNumber)' \
+          --build-url '$(TerraformBuildUrl)'
+        echo "##vso[task.setvariable variable=TERRAFORM_FMT_PR_COMMENT]$TERRAFORM_COMMAND_PR_COMMENT"
+      displayName: 'Render PR Comment - single file - Terraform fmt'
+    - task: GitHubComment@0
+      condition: and(not(eq(variables['System.PullRequest.PullRequestId'], '')), ne(variables['TERRAFORM_FMT_PR_COMMENT'], ''))
+      inputs:
+        gitHubConnection: 'mloskot'
+        repositoryName: '$(Build.Repository.Name)'
+        comment: $(TERRAFORM_FMT_PR_COMMENT)
+      displayName: 'Comment PR - single file - Terraform fmt'

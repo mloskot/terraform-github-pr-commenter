@@ -6,8 +6,8 @@ A complete test based on the [Terraform Get Started - Docker](https://developer.
 2. Generate log files with output from Terraform commands.
 3. Trigger rendering and posting GitHub PR comments.
 4. Follow [Change the Terraform code and the infrastructure](https://developer.hashicorp.com/terraform/tutorials/docker-get-started/docker-build).
-   in order to obtain logs with different output.
-   Then, repeat steps 2. and 3. in order to generate logs that let observe interesting comments.
+   in order to obtain logs with different output. Then, repeat steps 2. and 3.
+   in order to generate logs that let observe interesting comments.
 5. Remove infrastructure.
 
 ## 1. Build Infrastructure
