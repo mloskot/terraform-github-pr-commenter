@@ -278,19 +278,19 @@ fi
 ### Render comment title
 comment_title=""
 if [[ $cfg_enable_rendering -gt 0 ]]; then
-    comment_title+="## Terraform"
+    comment_title+="##"
     if [[ -n "${arg_build_url}" ]]; then
         comment_title+=" [${arg_build_number}](${arg_build_url})"
     else
         comment_title+=" \`${arg_build_number}\`"
     fi
+    comment_title+=": \`${arg_tf_command}\`\n\n"
     if [[ -n "${arg_build_env}" ]]; then
         comment_title+=" - \`${arg_build_env}\`"
     fi
     if [[ -n "${section_component}" ]]; then
         comment_title+=" - \`${section_component}\`"
     fi
-    comment_title+=" - \`${arg_tf_command}\`\n\n"
 fi
 
 # Return result
