@@ -27,6 +27,7 @@ function usage
     echo "  -d,--disable-outer-details  Disable outer HTML <details> section"
     echo "  -l,--dry-run-list-logs      Dry run listing log files only"
     echo "  -h,--help                   Displays this message"
+    echo "  --version                   Displays version of the script"
     exit 1
 }
 function die
@@ -69,6 +70,7 @@ do
         -d|--disable-outer-details) arg_disable_outer_details=1; echolog "Disabling outer details";;
         -l|--dry-run-list-logs) arg_dry_run_list_logs=1; echolog "Dry run listing logs"; shift;;
         -h|--help) usage;;
+        --version) echo "${VERSION}"; exit;;
         *) echolog "Unknown argument: $1"; usage;;
     esac;
     shift
